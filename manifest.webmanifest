@@ -1,0 +1,16 @@
+{
+  "name": "Route Log",
+  "short_name": "Route Log",
+  "description": "Log substitute bus driving trips and send schools a record of what they owe.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E4E2DA",
+  "theme_color": "#17191C",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

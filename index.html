@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Route Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#17191C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Route Log">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+  :root{
+    --ground:#E4E2DA;
+    --surface:#FBFAF7;
+    --ink:#17191C;
+    --rubber:#5A5D5A;
+    --hair:#C9C6BC;
+    --bus:#F2B705;
+    --lamp:#D9451F;
+    --cond:"Roboto Condensed","Helvetica Neue Condensed","Arial Narrow","Segoe UI",Roboto,Arial,sans-serif;
+    --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    -webkit-text-size-adjust:100%;
+    height:100dvh;
+    display:flex;
+    justify-content:center;
+  }
+  .shell{
+    flex:1;min-width:0;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+  }
+  .headright{display:flex;align-items:center;gap:8px}
+  .add-top{display:none}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    flex:none;
+    background:var(--ink);
+    color:var(--surface);
+    padding:calc(12px + env(safe-area-inset-top)) 16px 0;
+    border-bottom:6px solid var(--bus);
+  }
+  .masthead .row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .wordmark{
+    font-family:var(--cond);font-weight:700;font-size:23px;letter-spacing:.02em;
+  }
+  .wordmark span{color:var(--bus)}
+  .settings-btn{
+    background:none;border:1px solid #4A4D50;border-radius:2px;color:#C9C6BC;
+    font-size:13px;padding:5px 9px;
+  }
+  .stub{
+    display:flex;gap:0;margin:10px -16px 0;border-top:1px solid #34373A;
+  }
+  .stub div{
+    flex:1;padding:9px 16px 11px;border-right:1px solid #34373A;
+  }
+  .stub div:last-child{border-right:0}
+  .stub b{
+    display:block;font-family:var(--cond);font-weight:700;font-size:21px;line-height:1.1;
+    color:var(--surface);
+  }
+  .stub small{font-size:11.5px;color:#9A9C99;letter-spacing:.01em}
+
+  /* ---------- controls ---------- */
+  .controls{
+    flex:none;
+    display:flex;gap:6px;padding:12px 16px 4px;align-items:stretch;
+  }
+  .controls select{
+    flex:1;min-width:0;background:var(--surface);border:1px solid var(--hair);
+    border-radius:2px;padding:9px 6px;font-size:14px;
+  }
+  .sort{
+    flex:none;width:42px;padding:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--cond);font-weight:700;font-size:19px;line-height:1;color:var(--lamp);
+  }
+  .ghost{
+    background:var(--surface);border:1px solid var(--ink);border-radius:2px;
+    padding:9px 10px;font-size:14px;white-space:nowrap;
+  }
+
+  /* ---------- log ---------- */
+  main{
+    flex:1;min-height:0;
+    overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+    padding:0 16px 20px;
+  }
+  .month{
+    position:sticky;top:0;z-index:5;background:var(--ground);
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin:18px 0 6px;padding:6px 0 5px;border-bottom:2px solid var(--ink);
+  }
+  .month:first-child{margin-top:8px}
+  .month h2{margin:0;font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.01em}
+  .month em{font-family:var(--cond);font-style:normal;font-weight:700;font-size:16px}
+  .month em i{
+    font-style:normal;font-weight:400;font-size:13.5px;color:var(--rubber);margin-left:8px;
+  }
+
+  .trip{
+    display:flex;align-items:stretch;
+    background:var(--surface);border-bottom:1px solid var(--hair);
+  }
+  .tripmain{
+    flex:1;min-width:0;
+    display:grid;grid-template-columns:38px 58px 1fr auto;gap:11px;align-items:center;
+    text-align:left;background:none;border:0;padding:11px 4px 11px 10px;
+  }
+  .tripmain:active{background:#F0EDE4}
+  .dnum{font-family:var(--cond);font-weight:700;font-size:21px;line-height:1}
+  .dow{display:block;font-size:10.5px;color:var(--rubber);line-height:1.4}
+  .plate{
+    border:1px solid rgba(0,0,0,.35);border-radius:3px;
+    padding:6px 2px;text-align:center;
+    font-family:var(--cond);font-weight:700;font-size:17px;line-height:1;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .school{font-size:14.5px;font-weight:500;line-height:1.25}
+  .meta{font-family:var(--cond);font-size:13.5px;color:var(--rubber);margin-top:2px}
+  .fee{font-family:var(--cond);font-weight:700;font-size:18px;text-align:right}
+
+  .paidbox{
+    flex:none;width:48px;background:none;border:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .paidbox span{
+    width:24px;height:24px;border:1.5px solid var(--hair);border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;line-height:1;color:transparent;
+  }
+  .paidbox[aria-pressed="true"] span{
+    background:var(--ink);border-color:var(--ink);color:var(--bus);
+  }
+  .paidbox:active span{border-color:var(--ink)}
+  .is-paid .fee,.is-paid .school{color:var(--rubber)}
+
+  .bulk{
+    flex:none;
+    display:block;width:calc(100% - 32px);margin:6px 16px 0;
+    background:none;border:1px dashed var(--hair);border-radius:2px;
+    padding:9px;font-size:13.5px;color:var(--rubber);
+  }
+  .bulk:active{border-color:var(--ink);color:var(--ink)}
+
+  .empty{
+    background:var(--surface);border:1px dashed var(--hair);
+    padding:28px 20px;text-align:center;color:var(--rubber);
+    font-size:14.5px;line-height:1.5;margin-top:18px;
+  }
+
+  /* ---------- add button ---------- */
+  .addbar{
+    flex:none;
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    background:var(--ground);
+    border-top:1px solid var(--hair);
+  }
+  .add{
+    width:100%;background:var(--bus);color:var(--ink);
+    border:0;border-bottom:4px solid #B98C04;border-radius:3px;
+    font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.02em;
+    padding:14px;
+  }
+  .add:active{border-bottom-width:1px;transform:translateY(3px)}
+
+  /* ---------- sheet ---------- */
+  .scrim{
+    position:fixed;inset:0;z-index:40;background:rgba(23,25,28,.55);
+    display:none;
+  }
+  .scrim.on{display:block}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:41;
+    max-height:92vh;overflow-y:auto;
+    background:var(--surface);border-top:6px solid var(--bus);
+    border-radius:10px 10px 0 0;
+    padding:16px 16px calc(24px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .22s ease;
+  }
+  .sheet.on{transform:translateY(0)}
+  @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
+  .sheet h3{margin:2px 0 14px;font-family:var(--cond);font-weight:700;font-size:20px}
+  label{display:block;font-size:12.5px;color:var(--rubber);margin:0 0 4px}
+  .field{margin-bottom:13px}
+  .field input,.field select,.field textarea{
+    width:100%;background:#fff;border:1px solid var(--hair);border-radius:2px;
+    padding:11px 10px;font-size:16px;
+  }
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .colorwrap{display:flex;gap:9px;align-items:center}
+  .colorwrap input{flex:1}
+  #swatch{width:44px;height:44px;flex:none;border:1px solid var(--ink);border-radius:3px;background:#ccc}
+  .check{
+    display:flex;align-items:center;gap:10px;margin:2px 0 4px;
+    font-size:14.5px;color:var(--ink);
+  }
+  .check input{width:21px;height:21px;flex:none;accent-color:var(--ink)}
+  .sheet-actions{display:flex;gap:10px;margin-top:18px}
+  .save{
+    flex:1;background:var(--ink);color:var(--surface);border:0;border-radius:3px;
+    font-family:var(--cond);font-weight:700;font-size:18px;padding:13px;
+  }
+  .del{
+    background:none;border:1px solid var(--lamp);color:var(--lamp);border-radius:3px;
+    padding:13px 14px;font-size:14.5px;
+  }
+  .cancel{background:none;border:1px solid var(--hair);border-radius:3px;padding:13px 14px;font-size:14.5px}
+  .datarow{display:flex;gap:10px;margin-top:10px}
+  .datarow .cancel{flex:1;padding:11px 8px}
+  .hint{font-size:12.5px;color:var(--rubber);line-height:1.45;margin:10px 0 0}
+  .warn{flex:none;background:#FDF3E3;border:1px solid #E8C67A;padding:10px 12px;font-size:13px;margin:12px 16px 0}
+
+  /* ---------- pointer, not finger ---------- */
+  @media (hover:hover){
+    .tripmain:hover{background:#F3F0E7}
+    .paidbox:hover span{border-color:var(--rubber)}
+    .ghost:hover{background:#fff;border-color:var(--ink)}
+    .settings-btn:hover{border-color:#7C7F82;color:var(--surface)}
+    .bulk:hover{border-color:var(--ink);color:var(--ink)}
+    .add:hover,.add-top:hover{background:#FFC61A}
+    .save:hover{background:#2A2E32}
+    .cancel:hover{border-color:var(--ink)}
+    .del:hover{background:#FCEDE9}
+  }
+
+  /* ---------- wide screens ---------- */
+  @media (min-width:760px){
+    .shell{
+      max-width:1020px;
+      border-left:1px solid var(--hair);
+      border-right:1px solid var(--hair);
+      background:var(--ground);
+    }
+    .masthead{padding:14px 24px 0}
+    .wordmark{font-size:26px}
+    .add-top{
+      display:inline-block;
+      background:var(--bus);color:var(--ink);border:0;border-radius:2px;
+      font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.02em;
+      padding:8px 16px;
+    }
+    .stub{margin:12px -24px 0}
+    .stub div{padding:10px 24px 12px;flex:0 1 auto;min-width:170px}
+    .stub div:last-child{flex:1}
+    .stub b{font-size:23px}
+
+    .controls{padding:14px 24px 4px;gap:8px}
+    .controls select{flex:0 1 240px;font-size:14.5px;padding:9px 10px}
+    .ghost{padding:9px 14px;font-size:14.5px}
+    #btnExport{margin-left:auto}
+    .bulk{width:calc(100% - 48px);margin:8px 24px 0;padding:10px}
+
+    main{padding:0 24px 24px}
+    .month{margin:20px 0 6px}
+    .month h2{font-size:18px}
+
+    .tripmain{
+      grid-template-columns:74px 76px 1fr 130px;
+      gap:16px;padding:12px 6px 12px 14px;
+    }
+    .date{display:flex;align-items:baseline;gap:7px}
+    .dow{display:inline;font-size:13px}
+    .dnum{font-size:22px}
+    .plate{font-size:18px;padding:7px 3px}
+    .school{font-size:15px}
+    .meta{font-size:14px}
+    .fee{font-size:19px}
+    .paidbox{width:58px}
+    .paidbox span{width:26px;height:26px;font-size:16px}
+
+    .addbar{display:none}
+
+    /* sheets become centred dialogs rather than thumb-reachable drawers */
+    .sheet{
+      top:50%;bottom:auto;left:50%;right:auto;
+      width:min(580px,calc(100vw - 48px));
+      max-height:86vh;
+      border-radius:6px;
+      padding:20px 22px 24px;
+      transform:translate(-50%,-46%);
+      opacity:0;pointer-events:none;
+      transition:transform .18s ease,opacity .18s ease;
+      box-shadow:0 24px 60px rgba(23,25,28,.28);
+    }
+    .sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+    @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
+    .sheet h3{font-size:22px}
+    .field input,.field select,.field textarea{font-size:15px;padding:10px}
+  }
+
+  /* ---------- printed report ---------- */
+  #report{display:none}
+  @media print{
+    html,body{height:auto;overflow:visible;display:block}
+    body{background:#fff;padding:0}
+    .shell,.scrim,.sheet{display:none !important}
+    .warn{display:none !important}
+    #report{display:block;color:#000;font-family:var(--body)}
+    @page{margin:.6in}
+    .rpt-head{border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:4px}
+    .rpt-head h1{font-family:var(--cond);font-size:26px;margin:0 0 3px;font-weight:700}
+    .rpt-head .who{font-size:13px;line-height:1.5}
+    .rpt-head .period{font-size:13px;margin-top:6px}
+    table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px}
+    th{
+      text-align:left;font-family:var(--cond);font-weight:700;font-size:13px;
+      border-bottom:1.5px solid #000;padding:5px 6px;
+    }
+    td{padding:6px;border-bottom:.5px solid #bbb;vertical-align:top}
+    td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+    tfoot td{border-top:1.5px solid #000;border-bottom:0;font-weight:700;font-size:14px;padding-top:8px}
+    tfoot tr:not(:first-child) td{border-top:0;padding-top:2px}
+    tfoot tr.q td{font-weight:400;font-size:12.5px;color:#444}
+    .sign{margin-top:46px;display:flex;gap:40px;font-size:12px}
+    .sign div{flex:1;border-top:1px solid #000;padding-top:5px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+<header class="masthead">
+  <div class="row">
+    <div class="wordmark">Route <span>Log</span></div>
+    <div class="headright">
+      <button class="add-top" id="btnAddTop">Log a trip</button>
+      <button class="settings-btn" id="btnSettings">Your details</button>
+    </div>
+  </div>
+  <div class="stub">
+    <div><b id="sMonth">$0</b><small id="sMonthLbl">this month</small></div>
+    <div><b id="sTrips">0</b><small>trips logged</small></div>
+    <div><b id="sAll">$0</b><small id="sAllLbl">still owed</small></div>
+  </div>
+</header>
+
+<div id="storageWarn" class="warn" hidden>This browser is blocking storage, so trips won't survive a reload. Private browsing is the usual cause — open the file in a normal window, or use <strong>Back up</strong> under Your details before you close it.</div>
+
+<div class="controls">
+  <select id="fSchool" aria-label="Filter by school"><option value="">All schools</option></select>
+  <select id="fMonth" aria-label="Filter by month"><option value="">All dates</option></select>
+  <button class="ghost" id="btnExport">PDF</button>
+  <button class="ghost sort" id="btnSort" aria-label="Newest first. Tap to show oldest first."><span id="sortArrow" aria-hidden="true">↓</span></button>
+</div>
+
+<button class="bulk" id="bulkPay" hidden></button>
+
+<main id="log"></main>
+
+<div class="addbar"><button class="add" id="btnAdd">Log a trip</button></div>
+
+</div><!-- /shell -->
+
+<div class="scrim" id="scrim"></div>
+
+<!-- trip sheet -->
+<section class="sheet" id="sheetTrip" role="dialog" aria-modal="true" aria-labelledby="tripTitle">
+  <h3 id="tripTitle">Log a trip</h3>
+  <div class="field">
+    <label for="fDate">Date</label>
+    <input type="date" id="fDate">
+  </div>
+  <div class="field">
+    <label for="fSchoolIn">School</label>
+    <input type="text" id="fSchoolIn" list="schoolList" placeholder="Lincoln Elementary" autocomplete="off">
+    <datalist id="schoolList"></datalist>
+  </div>
+  <div class="two">
+    <div class="field">
+      <label for="fBus">Bus number</label>
+      <input type="text" id="fBus" inputmode="numeric" placeholder="217">
+    </div>
+    <div class="field">
+      <label for="fRun">Run</label>
+      <select id="fRun">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+        <option value="Midday">Midday</option>
+        <option value="Field trip">Field trip</option>
+        <option value="Sports">Sports</option>
+        <option value="">None</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label for="fColor">Bus color</label>
+    <div class="colorwrap">
+      <div id="swatch" aria-hidden="true"></div>
+      <input type="text" id="fColor" list="colorList" placeholder="Yellow" autocomplete="off">
+      <datalist id="colorList">
+        <option>Yellow</option><option>White</option><option>Blue</option>
+        <option>Black</option><option>Silver</option><option>Green</option>
+        <option>Red</option><option>Orange</option><option>Tan</option>
+      </datalist>
+    </div>
+  </div>
+  <div class="three">
+    <div class="field">
+      <label for="fStart">Start</label>
+      <input type="time" id="fStart">
+    </div>
+    <div class="field">
+      <label for="fEnd">End</label>
+      <input type="time" id="fEnd">
+    </div>
+    <div class="field">
+      <label for="fFee">Fee</label>
+      <input type="number" id="fFee" inputmode="decimal" step="0.01" min="0" placeholder="88.00">
+    </div>
+  </div>
+  <div class="field">
+    <label for="fNote">Note for the school (optional)</label>
+    <input type="text" id="fNote" placeholder="Covered route 12 for J. Alvarez">
+  </div>
+  <label class="check" for="fPaid">
+    <input type="checkbox" id="fPaid">
+    <span>I've been paid for this trip</span>
+  </label>
+  <div class="sheet-actions">
+    <button class="save" id="btnSave">Save trip</button>
+    <button class="del" id="btnDelete" hidden>Delete</button>
+    <button class="cancel" id="btnCancelTrip">Cancel</button>
+  </div>
+</section>
+
+<!-- export sheet -->
+<section class="sheet" id="sheetExport" role="dialog" aria-modal="true" aria-labelledby="expTitle">
+  <h3 id="expTitle">Send a school your trips</h3>
+  <div class="field">
+    <label for="xSchool">School</label>
+    <select id="xSchool"></select>
+  </div>
+  <div class="two">
+    <div class="field"><label for="xFrom">From</label><input type="date" id="xFrom"></div>
+    <div class="field"><label for="xTo">To</label><input type="date" id="xTo"></div>
+  </div>
+  <label class="check" for="xUnpaid">
+    <input type="checkbox" id="xUnpaid" checked>
+    <span>Only trips I haven't been paid for</span>
+  </label>
+  <p class="hint" id="xCount"></p>
+  <div class="sheet-actions">
+    <button class="save" id="btnPrint">Make the PDF</button>
+    <button class="cancel" id="btnXCsv">Spreadsheet</button>
+    <button class="cancel" id="btnCancelExport">Cancel</button>
+  </div>
+  <p class="hint">Your print screen opens. Choose <strong>Save as PDF</strong> (or Print to PDF) to get a file you can email. <strong>Spreadsheet</strong> sends the same trips as a CSV instead.</p>
+</section>
+
+<!-- settings sheet -->
+<section class="sheet" id="sheetSettings" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <h3 id="setTitle">Your details</h3>
+  <p class="hint" style="margin:0 0 14px">These print at the top of every PDF you send out.</p>
+  <div class="field"><label for="dName">Name</label><input type="text" id="dName" placeholder="Yaakov"></div>
+  <div class="two">
+    <div class="field"><label for="dPhone">Phone</label><input type="tel" id="dPhone"></div>
+    <div class="field"><label for="dLicense">CDL / driver ID</label><input type="text" id="dLicense"></div>
+  </div>
+  <div class="sheet-actions">
+    <button class="save" id="btnSaveSettings">Save</button>
+    <button class="cancel" id="btnCancelSettings">Close</button>
+  </div>
+  <div class="datarow">
+    <button class="cancel" id="btnBackup">Back up trips</button>
+    <button class="cancel" id="btnRestore">Restore a backup</button>
+    <input type="file" id="fileRestore" accept="application/json,.json" hidden>
+  </div>
+  <div class="datarow">
+    <button class="cancel" id="btnCsvOut">Export spreadsheet</button>
+    <button class="cancel" id="btnCsvIn">Import spreadsheet</button>
+    <input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+  </div>
+  <p class="hint" id="storeWhere"></p>
+</section>
+
+<div id="report"></div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "routelog:v1";
+  var state = { driver:{name:"",phone:"",license:""}, trips:[], sort:"desc" };
+  var editingId = null;
+
+  /* ---------- storage ----------
+     Three modes, picked at startup:
+       "hosted"  window.storage — present when this runs inside the Claude chat
+       "device"  browser storage — used when the file is opened on its own
+       "memory"  last resort; warns the user, since nothing survives a reload   */
+  var mode = "memory", memValue = null;
+
+  function pickMode(){
+    if(window.storage && typeof window.storage.get === "function") return "hosted";
+    try{
+      var probeKey = "routelog:probe";
+      window.localStorage.setItem(probeKey, "1");
+      window.localStorage.removeItem(probeKey);
+      return "device";
+    }catch(e){ return "memory"; }
+  }
+
+  function warn(on){ $("storageWarn").hidden = !on; }
+
+  async function readRaw(){
+    if(mode === "hosted"){
+      var r = await window.storage.get(KEY);
+      return r && r.value ? r.value : null;
+    }
+    if(mode === "device") return window.localStorage.getItem(KEY);
+    return memValue;
+  }
+  async function writeRaw(str){
+    if(mode === "hosted"){ await window.storage.set(KEY, str); return; }
+    if(mode === "device"){ window.localStorage.setItem(KEY, str); return; }
+    memValue = str;
+  }
+
+  function adopt(parsed){
+    if(parsed && Array.isArray(parsed.trips)){
+      state = {
+        driver: parsed.driver || {name:"",phone:"",license:""},
+        trips: parsed.trips,
+        sort: parsed.sort === "asc" ? "asc" : "desc"
+      };
+      return true;
+    }
+    return false;
+  }
+
+  async function load(){
+    mode = pickMode();
+    warn(mode === "memory");
+    try{
+      var raw = await readRaw();
+      if(raw) adopt(JSON.parse(raw));
+    }catch(e){ /* first run, or nothing readable yet */ }
+    describeStore();
+  }
+
+  async function save(){
+    try{
+      await writeRaw(JSON.stringify(state));
+    }catch(e){
+      // storage filled up or was revoked mid-session — keep working, but say so
+      mode = "memory";
+      memValue = JSON.stringify(state);
+      warn(true);
+      describeStore();
+    }
+  }
+
+  function describeStore(){
+    var el = $("storeWhere");
+    if(!el) return;
+    el.textContent =
+      mode === "hosted" ? "Saved in your Claude chat. Back up before you open this file anywhere else."
+    : mode === "device" ? "Saved on this device, in this browser. Back up before clearing browsing data."
+    : "Not being saved. Back up now or you'll lose this session.";
+  }
+
+  /* ---------- helpers ---------- */
+  var money = new Intl.NumberFormat(undefined,{style:"currency",currency:"USD"});
+  function $(id){ return document.getElementById(id); }
+  function uid(){ return "t"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]; }); }
+
+  function d(iso){ // "YYYY-MM-DD" -> local Date, no timezone slip
+    if(!iso) return new Date(NaN);
+    var p = iso.split("-");
+    return new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  function todayISO(){
+    var n = new Date();
+    return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+  }
+  function fmtTime(t){
+    if(!t) return "";
+    var p = t.split(":"), h = +p[0], m = p[1];
+    var ap = h < 12 ? "a" : "p";
+    var hh = h % 12; if(hh === 0) hh = 12;
+    return hh + ":" + m + ap;
+  }
+  function monthKey(iso){ return iso ? iso.slice(0,7) : ""; }
+  function monthName(key){
+    var p = key.split("-");
+    return new Date(+p[0], +p[1]-1, 1).toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  }
+
+  var probe = document.createElement("span");
+  var colorCache = {};
+  function resolveColor(name){
+    var k = (name||"").trim().toLowerCase();
+    if(!k) return [201,198,188];
+    if(colorCache[k]) return colorCache[k];
+    probe.style.color = "";
+    probe.style.color = k;
+    if(!probe.style.color){ colorCache[k] = [201,198,188]; return colorCache[k]; }
+    document.body.appendChild(probe);
+    var rgb = getComputedStyle(probe).color.match(/\d+/g) || [201,198,188];
+    document.body.removeChild(probe);
+    var out = [+rgb[0], +rgb[1], +rgb[2]];
+    colorCache[k] = out;
+    return out;
+  }
+  function readable(rgb){
+    var l = (0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2]);
+    return l > 150 ? "#17191C" : "#FBFAF7";
+  }
+
+  // dir omitted means newest first, which is what the entry form wants
+  // regardless of how the list happens to be ordered on screen
+  function sorted(dir){
+    var up = dir === "asc" ? 1 : -1;
+    return state.trips.slice().sort(function(a,b){
+      if(a.date === b.date) return up * (a.start||"").localeCompare(b.start||"");
+      return up * a.date.localeCompare(b.date);
+    });
+  }
+  function schools(){
+    var s = {};
+    state.trips.forEach(function(t){ if(t.school) s[t.school] = 1; });
+    return Object.keys(s).sort(function(a,b){ return a.localeCompare(b); });
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    var all = sorted(state.sort);
+    $("sortArrow").textContent = state.sort === "asc" ? "↑" : "↓";
+    $("btnSort").setAttribute("aria-label", state.sort === "asc"
+      ? "Oldest first. Tap to show newest first."
+      : "Newest first. Tap to show oldest first.");
+    $("btnSort").title = state.sort === "asc" ? "Oldest first" : "Newest first";
+    var fs = $("fSchool").value, fm = $("fMonth").value;
+    var list = all.filter(function(t){
+      return (!fs || t.school === fs) && (!fm || monthKey(t.date) === fm);
+    });
+
+    // totals — every figure reflects what's currently on screen
+    var shown = 0, owed = 0;
+    list.forEach(function(t){
+      var f = +t.fee || 0;
+      shown += f;
+      if(!t.paid) owed += f;
+    });
+    var narrowed = !!(fs || fm);
+    $("sMonth").textContent = money.format(shown);
+    $("sMonthLbl").textContent = narrowed ? "shown here" : "all time";
+    $("sTrips").textContent = list.length;
+    $("sAll").textContent = money.format(owed);
+    $("sAllLbl").textContent = owed > 0 ? "still owed" : "all settled";
+    $("sAll").style.color = owed > 0 ? "var(--bus)" : "";
+
+    // bulk check-off, only when there's something to check off
+    var unpaidList = list.filter(function(t){ return !t.paid; });
+    var bulk = $("bulkPay");
+    if(unpaidList.length > 1){
+      bulk.hidden = false;
+      bulk.textContent = "Mark these " + unpaidList.length + " trips paid";
+    } else {
+      bulk.hidden = true;
+    }
+
+    // filters
+    var keep = $("fSchool").value;
+    $("fSchool").innerHTML = '<option value="">All schools</option>' +
+      schools().map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+"</option>"; }).join("");
+    $("fSchool").value = keep;
+
+    var mk = {}; all.forEach(function(t){ if(t.date) mk[monthKey(t.date)] = 1; });
+    var months = Object.keys(mk).sort().reverse();
+    var keepM = $("fMonth").value;
+    $("fMonth").innerHTML = '<option value="">All dates</option>' +
+      months.map(function(m){ return '<option value="'+m+'">'+esc(monthName(m))+"</option>"; }).join("");
+    $("fMonth").value = keepM;
+
+    $("schoolList").innerHTML = schools().map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
+
+    // log
+    var log = $("log");
+    var keepScroll = log.scrollTop;
+    if(!list.length){
+      log.innerHTML = '<p class="empty">' + (all.length
+        ? "No trips match those filters."
+        : "Nothing logged yet.<br>Tap <strong>Log a trip</strong> after your next run.") + "</p>";
+      return;
+    }
+    var html = "", cur = "";
+    list.forEach(function(t){
+      var mkk = monthKey(t.date);
+      if(mkk !== cur){
+        cur = mkk;
+        var inMonth = list.filter(function(x){ return monthKey(x.date) === mkk; });
+        var sub = inMonth.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
+        var due = inMonth.reduce(function(n,x){ return n + (x.paid ? 0 : (+x.fee||0)); }, 0);
+        html += '<div class="month"><h2>' + esc(monthName(mkk)) + "</h2><em>" + money.format(sub)
+          + (due > 0 && due !== sub ? '<i>' + money.format(due) + " out</i>" : "") + "</em></div>";
+      }
+      var dt = d(t.date);
+      var rgb = resolveColor(t.color);
+      var meta = [fmtTime(t.start) + (t.end ? "–" + fmtTime(t.end) : ""), t.run].filter(Boolean).join("   ");
+      html += '<div class="trip' + (t.paid ? " is-paid" : "") + '">'
+        + '<button class="tripmain" data-id="'+t.id+'">'
+        + '<span class="date"><span class="dow">'+dt.toLocaleDateString(undefined,{weekday:"short"})+'</span>'
+        + '<span class="dnum">'+dt.getDate()+"</span></span>"
+        + '<span class="plate" style="background:rgb('+rgb.join(",")+');color:'+readable(rgb)+'">'+esc(t.bus||"—")+"</span>"
+        + '<span class="mid"><span class="school">'+esc(t.school||"Unnamed school")+"</span>"
+        + '<span class="meta">'+esc(meta)+"</span></span>"
+        + '<span class="fee">'+money.format(+t.fee||0)+"</span>"
+        + "</button>"
+        + '<button class="paidbox" data-pay="'+t.id+'" aria-pressed="'+(t.paid?"true":"false")+'"'
+        + ' aria-label="' + (t.paid ? "Paid. Tap to mark unpaid." : "Not paid yet. Tap when the money comes in.") + '">'
+        + '<span aria-hidden="true">✓</span></button>'
+        + "</div>";
+    });
+    log.innerHTML = html;
+    log.scrollTop = keepScroll;
+  }
+
+  /* ---------- sheets ---------- */
+  function open(el, focusId){
+    $("scrim").classList.add("on");
+    el.classList.add("on");
+    // Only grab focus for a pointer/keyboard session; on a phone this would
+    // throw the keyboard up over the sheet before he's chosen anything.
+    if(focusId && window.matchMedia("(hover:hover) and (min-width:760px)").matches){
+      setTimeout(function(){ var f = $(focusId); if(f) f.focus(); }, 60);
+    }
+  }
+  function closeAll(){
+    $("scrim").classList.remove("on");
+    ["sheetTrip","sheetExport","sheetSettings"].forEach(function(i){ $(i).classList.remove("on"); });
+  }
+  $("scrim").addEventListener("click", closeAll);
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeAll(); });
+
+  function openTrip(id){
+    editingId = id || null;
+    var t = id ? state.trips.find(function(x){ return x.id === id; }) : null;
+    var last = sorted()[0];
+    $("tripTitle").textContent = t ? "Edit trip" : "Log a trip";
+    $("fDate").value = t ? t.date : todayISO();
+    $("fSchoolIn").value = t ? t.school : (last ? last.school : "");
+    $("fBus").value = t ? t.bus : (last ? last.bus : "");
+    $("fColor").value = t ? t.color : (last ? last.color : "Yellow");
+    $("fRun").value = t ? t.run : "AM";
+    $("fStart").value = t ? t.start : "";
+    $("fEnd").value = t ? t.end : "";
+    $("fFee").value = t ? t.fee : (last ? last.fee : "");
+    $("fNote").value = t ? (t.note || "") : "";
+    $("fPaid").checked = t ? !!t.paid : false;
+    $("btnDelete").hidden = !t;
+    paintSwatch();
+    open($("sheetTrip"), "fSchoolIn");
+  }
+  function paintSwatch(){
+    var rgb = resolveColor($("fColor").value);
+    $("swatch").style.background = "rgb(" + rgb.join(",") + ")";
+  }
+  $("fColor").addEventListener("input", paintSwatch);
+
+  $("btnAdd").addEventListener("click", function(){ openTrip(null); });
+  $("btnAddTop").addEventListener("click", function(){ openTrip(null); });
+
+  // Enter saves from any single-line field in the trip sheet — desktop expects it
+  $("sheetTrip").addEventListener("keydown", function(e){
+    if(e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type !== "checkbox"){
+      e.preventDefault();
+      $("btnSave").click();
+    }
+  });
+  $("sheetExport").addEventListener("keydown", function(e){
+    if(e.key === "Enter" && !$("btnPrint").disabled){ e.preventDefault(); $("btnPrint").click(); }
+  });
+  $("btnCancelTrip").addEventListener("click", closeAll);
+  $("btnCancelExport").addEventListener("click", closeAll);
+  $("btnCancelSettings").addEventListener("click", closeAll);
+
+  $("log").addEventListener("click", async function(e){
+    var box = e.target.closest(".paidbox");
+    if(box){
+      var t = state.trips.find(function(x){ return x.id === box.dataset.pay; });
+      if(!t) return;
+      t.paid = !t.paid;
+      t.paidOn = t.paid ? todayISO() : "";
+      render(); await save();
+      return;
+    }
+    var b = e.target.closest(".tripmain");
+    if(b) openTrip(b.dataset.id);
+  });
+
+  $("bulkPay").addEventListener("click", async function(){
+    var fs = $("fSchool").value, fm = $("fMonth").value;
+    var hit = state.trips.filter(function(t){
+      return !t.paid && (!fs || t.school === fs) && (!fm || monthKey(t.date) === fm);
+    });
+    if(!hit.length) return;
+    var sum = hit.reduce(function(n,t){ return n + (+t.fee||0); }, 0);
+    if(!confirm("Mark " + hit.length + " trips paid? That's " + money.format(sum) + ".")) return;
+    hit.forEach(function(t){ t.paid = true; t.paidOn = todayISO(); });
+    render(); await save();
+  });
+
+  $("btnSave").addEventListener("click", async function(){
+    var rec = {
+      id: editingId || uid(),
+      date: $("fDate").value || todayISO(),
+      school: $("fSchoolIn").value.trim(),
+      bus: $("fBus").value.trim(),
+      color: $("fColor").value.trim(),
+      run: $("fRun").value,
+      start: $("fStart").value,
+      end: $("fEnd").value,
+      fee: $("fFee").value === "" ? 0 : +$("fFee").value,
+      note: $("fNote").value.trim(),
+      paid: $("fPaid").checked,
+      paidOn: $("fPaid").checked
+        ? ((editingId && (state.trips.find(function(x){ return x.id === editingId; }) || {}).paidOn) || todayISO())
+        : ""
+    };
+    if(editingId){
+      var i = state.trips.findIndex(function(x){ return x.id === editingId; });
+      state.trips[i] = rec;
+    } else {
+      state.trips.push(rec);
+    }
+    closeAll(); render(); await save();
+  });
+
+  $("btnDelete").addEventListener("click", async function(){
+    if(!editingId) return;
+    state.trips = state.trips.filter(function(x){ return x.id !== editingId; });
+    closeAll(); render(); await save();
+  });
+
+  $("btnSort").addEventListener("click", async function(){
+    state.sort = state.sort === "asc" ? "desc" : "asc";
+    render();
+    $("log").scrollTo({ top:0, behavior:"smooth" });
+    await save();
+  });
+
+  function refilter(){ render(); $("log").scrollTop = 0; }
+  $("fSchool").addEventListener("change", refilter);
+  $("fMonth").addEventListener("change", refilter);
+
+  /* ---------- settings ---------- */
+  $("btnSettings").addEventListener("click", function(){
+    $("dName").value = state.driver.name || "";
+    $("dPhone").value = state.driver.phone || "";
+    $("dLicense").value = state.driver.license || "";
+    open($("sheetSettings"), "dName");
+  });
+  $("btnSaveSettings").addEventListener("click", async function(){
+    state.driver = { name:$("dName").value.trim(), phone:$("dPhone").value.trim(), license:$("dLicense").value.trim() };
+    closeAll(); await save();
+  });
+  $("btnRestore").addEventListener("click", function(){ $("fileRestore").click(); });
+  $("fileRestore").addEventListener("change", async function(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    var text = await f.text();
+    var parsed;
+    try{ parsed = JSON.parse(text); }
+    catch(err){ alert("That file isn't a Route Log backup."); e.target.value = ""; return; }
+    if(!parsed || !Array.isArray(parsed.trips)){
+      alert("That file isn't a Route Log backup.");
+      e.target.value = ""; return;
+    }
+    var byId = {};
+    state.trips.forEach(function(t){ byId[t.id] = t; });
+    var added = 0;
+    parsed.trips.forEach(function(t){
+      if(!t || !t.id) return;
+      if(!byId[t.id]) added++;
+      byId[t.id] = t;
+    });
+    state.trips = Object.keys(byId).map(function(k){ return byId[k]; });
+    if(parsed.driver && !state.driver.name) state.driver = parsed.driver;
+    e.target.value = "";
+    render(); await save();
+    alert(added + (added === 1 ? " trip added." : " trips added.") + " Nothing was overwritten except matching entries.");
+  });
+
+  /* ---------- spreadsheet in and out ---------- */
+  var CSV_COLS = ["Date","School","Bus","Color","Run","Start","End","Fee","Paid","Paid On","Note","ID"];
+
+  function csvCell(v){
+    var s = v == null ? "" : String(v);
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function toCSV(rows){
+    var out = [CSV_COLS.join(",")];
+    rows.forEach(function(t){
+      out.push([
+        t.date, t.school, t.bus, t.color, t.run,
+        fmtTime(t.start), fmtTime(t.end),
+        (+t.fee || 0).toFixed(2),
+        t.paid ? "Yes" : "No",
+        t.paidOn || "", t.note || "", t.id
+      ].map(csvCell).join(","));
+    });
+    // BOM so Excel opens it as UTF-8 rather than mangling anything
+    return "\uFEFF" + out.join("\r\n") + "\r\n";
+  }
+
+  // RFC 4180: quoted fields may hold commas, newlines, and doubled quotes
+  function parseCSV(text){
+    text = text.replace(/^\uFEFF/, "");
+    var rows = [], row = [], cell = "", q = false, i = 0;
+    while(i < text.length){
+      var c = text[i];
+      if(q){
+        if(c === '"'){
+          if(text[i+1] === '"'){ cell += '"'; i += 2; continue; }
+          q = false; i++; continue;
+        }
+        cell += c; i++; continue;
+      }
+      if(c === '"'){ q = true; i++; continue; }
+      if(c === ","){ row.push(cell); cell = ""; i++; continue; }
+      if(c === "\r"){ i++; continue; }
+      if(c === "\n"){ row.push(cell); rows.push(row); row = []; cell = ""; i++; continue; }
+      cell += c; i++;
+    }
+    if(cell !== "" || row.length){ row.push(cell); rows.push(row); }
+    return rows.filter(function(r){ return r.some(function(x){ return String(x).trim() !== ""; }); });
+  }
+
+  // Spreadsheets rewrite dates in whatever the machine's locale is.
+  function readDate(v){
+    var s = String(v || "").trim();
+    if(!s) return "";
+    var iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(iso) return iso[1] + "-" + String(+iso[2]).padStart(2,"0") + "-" + String(+iso[3]).padStart(2,"0");
+    var us = s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/);
+    if(us){
+      var y = +us[3]; if(y < 100) y += 2000;
+      return y + "-" + String(+us[1]).padStart(2,"0") + "-" + String(+us[2]).padStart(2,"0");
+    }
+    var p = new Date(s);
+    if(!isNaN(p)) return p.getFullYear() + "-" + String(p.getMonth()+1).padStart(2,"0") + "-" + String(p.getDate()).padStart(2,"0");
+    return "";
+  }
+  function readTime(v){
+    var s = String(v || "").trim().toLowerCase();
+    if(!s) return "";
+    var m = s.match(/^(\d{1,2})[:.](\d{2})\s*([ap])?/);
+    if(!m) return "";
+    var h = +m[1];
+    if(m[3] === "p" && h < 12) h += 12;
+    if(m[3] === "a" && h === 12) h = 0;
+    return String(h).padStart(2,"0") + ":" + m[2];
+  }
+  function readFee(v){
+    var n = parseFloat(String(v || "").replace(/[^0-9.\-]/g, ""));
+    return isNaN(n) ? 0 : n;
+  }
+  function readPaid(v){
+    return /^(y|yes|true|1|paid|x)$/i.test(String(v || "").trim());
+  }
+
+  function downloadFile(name, text, mime){
+    var url = URL.createObjectURL(new Blob([text], { type:mime }));
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    // Some Android webviews ignore a click on a detached anchor
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 2000);
+  }
+
+  function importCSV(text){
+    var rows = parseCSV(text);
+    if(rows.length < 2) return { added:0, updated:0, skipped:0, bad:true };
+
+    var head = rows[0].map(function(h){ return String(h).trim().toLowerCase(); });
+    function col(){
+      for(var i = 0; i < arguments.length; i++){
+        var at = head.indexOf(arguments[i]);
+        if(at !== -1) return at;
+      }
+      return -1;
+    }
+    var ix = {
+      date:   col("date"),
+      school: col("school"),
+      bus:    col("bus","bus number","bus #"),
+      color:  col("color","bus color","colour"),
+      run:    col("run","route","run type"),
+      start:  col("start","start time","time"),
+      end:    col("end","end time"),
+      fee:    col("fee","amount","pay","rate"),
+      paid:   col("paid","status"),
+      paidOn: col("paid on","paid date"),
+      note:   col("note","notes","comment"),
+      id:     col("id")
+    };
+    if(ix.date === -1) return { added:0, updated:0, skipped:0, bad:true };
+
+    function at(r, k){ return ix[k] === -1 ? "" : String(r[ix[k]] == null ? "" : r[ix[k]]).trim(); }
+
+    var byId = {}, fingerprint = {};
+    state.trips.forEach(function(t){
+      byId[t.id] = t;
+      fingerprint[[t.date,t.school,t.bus,t.start,+t.fee||0].join("|")] = t;
+    });
+
+    var added = 0, updated = 0, skipped = 0;
+    rows.slice(1).forEach(function(r){
+      var date = readDate(at(r,"date"));
+      if(!date){ skipped++; return; }
+
+      var rec = {
+        date: date,
+        school: at(r,"school"),
+        bus: at(r,"bus"),
+        color: at(r,"color"),
+        run: at(r,"run"),
+        start: readTime(at(r,"start")),
+        end: readTime(at(r,"end")),
+        fee: readFee(at(r,"fee")),
+        note: at(r,"note"),
+        paid: readPaid(at(r,"paid")),
+        paidOn: readDate(at(r,"paidOn"))
+      };
+      if(rec.paid && !rec.paidOn) rec.paidOn = todayISO();
+      if(!rec.paid) rec.paidOn = "";
+
+      var id = at(r,"id");
+      if(id && byId[id]){
+        rec.id = id;
+        var pos = state.trips.findIndex(function(x){ return x.id === id; });
+        state.trips[pos] = rec;
+        byId[id] = rec;
+        updated++;
+        return;
+      }
+      // No id, or an id we've never seen: guard against importing twice
+      var fp = [rec.date,rec.school,rec.bus,rec.start,rec.fee].join("|");
+      if(fingerprint[fp]){ skipped++; return; }
+
+      rec.id = id || uid();
+      state.trips.push(rec);
+      byId[rec.id] = rec;
+      fingerprint[fp] = rec;
+      added++;
+    });
+
+    return { added:added, updated:updated, skipped:skipped, bad:false };
+  }
+
+  $("btnCsvOut").addEventListener("click", function(){
+    if(!state.trips.length){ alert("Nothing to export yet."); return; }
+    downloadFile("route-log-" + todayISO() + ".csv", toCSV(sorted("asc")), "text/csv");
+  });
+
+  $("btnCsvIn").addEventListener("click", function(){ $("fileCsv").click(); });
+  $("fileCsv").addEventListener("change", async function(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    var res = importCSV(await f.text());
+    e.target.value = "";
+    if(res.bad){
+      alert("Couldn't read that file. It needs a header row with at least a Date column.");
+      return;
+    }
+    render(); await save();
+    alert(res.added + " added, " + res.updated + " updated, " + res.skipped
+      + " skipped (already logged, or no usable date).");
+  });
+
+  $("btnXCsv").addEventListener("click", function(){
+    var rows = exportRows();
+    if(!rows.length) return;
+    var tag = ($("xSchool").value || "trips").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+    downloadFile(tag + "-" + todayISO() + ".csv", toCSV(rows), "text/csv");
+  });
+
+  $("btnBackup").addEventListener("click", function(){
+    downloadFile("route-log-backup-" + todayISO() + ".json",
+      JSON.stringify(state, null, 2), "application/json");
+  });
+
+  /* ---------- export ---------- */
+  function exportRows(){
+    var s = $("xSchool").value, f = $("xFrom").value, t = $("xTo").value, unpaidOnly = $("xUnpaid").checked;
+    return state.trips
+      .filter(function(x){
+        if(s && x.school !== s) return false;
+        if(f && x.date < f) return false;
+        if(t && x.date > t) return false;
+        if(unpaidOnly && x.paid) return false;
+        return true;
+      })
+      .sort(function(a,b){ return a.date.localeCompare(b.date); });
+  }
+  function updateCount(){
+    var r = exportRows();
+    var sum = r.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
+    $("xCount").textContent = r.length
+      ? r.length + (r.length === 1 ? " trip" : " trips") + ", " + money.format(sum) + " total."
+      : ($("xUnpaid").checked
+          ? "Everything for that school is already marked paid. Untick the box to send the full record."
+          : "No trips match. Widen the dates or pick another school.");
+    $("btnPrint").disabled = !r.length;
+  }
+  $("btnExport").addEventListener("click", function(){
+    var list = schools();
+    if(!list.length){ alert("Log a trip first — there's nothing to send yet."); return; }
+    $("xSchool").innerHTML = list.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+"</option>"; }).join("");
+    if($("fSchool").value) $("xSchool").value = $("fSchool").value;
+    $("xFrom").value = ""; $("xTo").value = "";
+    updateCount();
+    open($("sheetExport"), "xSchool");
+  });
+  ["xSchool","xFrom","xTo","xUnpaid"].forEach(function(i){ $(i).addEventListener("change", updateCount); });
+
+  $("btnPrint").addEventListener("click", function(){
+    var rows = exportRows();
+    if(!rows.length) return;
+    var school = $("xSchool").value;
+    var sum = rows.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
+    var span = d(rows[0].date).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"})
+      + " – " + d(rows[rows.length-1].date).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"});
+    var who = state.driver.name || "Substitute driver";
+
+    var html = '<div class="rpt-head"><h1>Substitute driving record</h1>'
+      + '<div class="who"><strong>' + esc(school) + "</strong><br>"
+      + esc(who)
+      + (state.driver.license ? " &middot; ID " + esc(state.driver.license) : "")
+      + (state.driver.phone ? "<br>" + esc(state.driver.phone) : "")
+      + "</div>"
+      + '<div class="period">' + esc(span) + " &nbsp;|&nbsp; " + rows.length
+      + (rows.length === 1 ? " trip" : " trips") + "</div></div>"
+      + "<table><thead><tr><th>Date</th><th>Run</th><th>Bus</th><th>Color</th><th>Time</th><th>Status</th><th class='n'>Fee</th></tr></thead><tbody>";
+
+    var settled = 0;
+    rows.forEach(function(t){
+      var time = fmtTime(t.start) + (t.end ? " – " + fmtTime(t.end) : "");
+      if(t.paid) settled += (+t.fee || 0);
+      html += "<tr><td>" + d(t.date).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}) + "</td>"
+        + "<td>" + esc(t.run || "") + "</td>"
+        + "<td>" + esc(t.bus || "") + "</td>"
+        + "<td>" + esc(t.color || "") + "</td>"
+        + "<td>" + esc(time) + "</td>"
+        + "<td>" + (t.paid ? "Paid" + (t.paidOn ? " " + d(t.paidOn).toLocaleDateString(undefined,{month:"short",day:"numeric"}) : "") : "Outstanding") + "</td>"
+        + "<td class='n'>" + money.format(+t.fee||0) + "</td></tr>";
+      if(t.note){
+        html += '<tr><td colspan="7" style="padding-top:0;color:#444;font-size:11.5px">' + esc(t.note) + "</td></tr>";
+      }
+    });
+
+    html += "</tbody><tfoot>";
+    if(settled > 0 && settled < sum){
+      html += '<tr><td colspan="6">Trips billed</td><td class="n">' + money.format(sum) + "</td></tr>"
+        + '<tr class="q"><td colspan="6">Already paid</td><td class="n">&minus;' + money.format(settled) + "</td></tr>"
+        + '<tr><td colspan="6">Balance due</td><td class="n">' + money.format(sum - settled) + "</td></tr>";
+    } else if(settled >= sum){
+      html += '<tr><td colspan="6">Total, paid in full</td><td class="n">' + money.format(sum) + "</td></tr>";
+    } else {
+      html += '<tr><td colspan="6">Total due</td><td class="n">' + money.format(sum) + "</td></tr>";
+    }
+    html += "</tfoot></table>"
+      + '<div class="sign"><div>Driver signature</div><div>School authorization</div><div>Date</div></div>';
+
+    $("report").innerHTML = html;
+    closeAll();
+    setTimeout(function(){ window.print(); }, 220);
+  });
+
+  /* ---------- go ---------- */
+  (async function(){
+    await load();
+    render();
+
+    // Ask the browser not to evict the log. Chrome grants this to installed
+    // apps; Safari exempts home-screen apps from its 7-day storage sweep.
+    try{
+      if(navigator.storage && navigator.storage.persist) await navigator.storage.persist();
+    }catch(e){}
+
+    // Offline shell. Only runs when served over http(s) — opening the file
+    // directly still works, it just isn't installable.
+    if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+      try{ await navigator.serviceWorker.register("sw.js"); }catch(e){}
+    }
+  })();
+})();
+</script>
+</body>
+</html>
