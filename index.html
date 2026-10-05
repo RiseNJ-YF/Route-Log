@@ -5,327 +5,400 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Route Log</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#17191C">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Route Log">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" href="icons/icon-192.png">
 <style>
+  /* ===== iOS 27 system palette ===== */
   :root{
-    --ground:#E4E2DA;
-    --surface:#FBFAF7;
-    --ink:#17191C;
-    --rubber:#5A5D5A;
-    --hair:#C9C6BC;
-    --bus:#F2B705;
-    --lamp:#D9451F;
-    --cond:"Roboto Condensed","Helvetica Neue Condensed","Arial Narrow","Segoe UI",Roboto,Arial,sans-serif;
-    --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color-scheme:light dark;
+    --bg:#F2F2F7;
+    --bg-glass:rgba(242,242,247,.72);
+    --bg-glass-hi:rgba(242,242,247,.9);
+    --card:#FFFFFF;
+    --fill:rgba(120,120,128,.12);
+    --fill2:rgba(120,120,128,.20);
+    --label:#000000;
+    --label2:rgba(60,60,67,.60);
+    --label3:rgba(60,60,67,.30);
+    --sep:rgba(60,60,67,.20);
+    --tint:#FFCC00;
+    --tint-ink:#1C1C1E;
+    --tint-soft:rgba(255,204,0,.20);
+    --green:#34C759; --orange:#FF9500; --red:#FF3B30; --blue:#007AFF; --teal:#30B0C7;
+    --bus:var(--orange);             /* the scripts colour the owed figure with this */
+    /* Liquid Glass, as refined in iOS 27: stronger diffusion, a darkened rim, brighter speculars */
+    --glass:rgba(255,255,255,.62);
+    --glass-thick:rgba(255,255,255,.86);
+    --rim:rgba(0,0,0,.11);
+    --spec:rgba(255,255,255,.98);
+    --lift:0 6px 20px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+    --float:0 14px 34px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08);
+    --sheet:rgba(242,242,247,.93);
+    --thumb:#FFFFFF;
+    --plate-rim:rgba(0,0,0,.18);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --cond:var(--display);
+    --r-card:22px;
   }
-  *{box-sizing:border-box}
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#000000;
+      --bg-glass:rgba(0,0,0,.70);
+      --bg-glass-hi:rgba(0,0,0,.86);
+      --card:#1C1C1E;
+      --fill:rgba(118,118,128,.24);
+      --fill2:rgba(118,118,128,.36);
+      --label:#FFFFFF;
+      --label2:rgba(235,235,245,.60);
+      --label3:rgba(235,235,245,.30);
+      --sep:rgba(84,84,88,.65);
+      --tint:#FFD60A;
+      --tint-soft:rgba(255,214,10,.17);
+      --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF; --teal:#40C8E0;
+      --glass:rgba(58,58,60,.55);
+      --glass-thick:rgba(58,58,60,.82);
+      --rim:rgba(0,0,0,.6);
+      --spec:rgba(255,255,255,.24);
+      --lift:0 6px 20px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+      --float:0 14px 34px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4);
+      --sheet:rgba(28,28,30,.94);
+      --thumb:#636366;
+      --plate-rim:rgba(255,255,255,.22);
+    }
+  }
+  /* Reduce Transparency: glass turns solid, the way iOS honours the setting */
+  @media (prefers-reduced-transparency:reduce){
+    :root{ --glass:var(--card); --bg-glass:var(--bg); --sheet:var(--bg); }
+  }
+  @media (prefers-contrast:more){
+    :root{ --sep:var(--label3); --rim:rgba(0,0,0,.35); }
+  }
+
+  /* ===== base ===== */
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  [hidden]{display:none !important}
   html,body{margin:0;padding:0;height:100%;overflow:hidden}
   body{
-    background:var(--ground);
-    color:var(--ink);
-    font-family:var(--body);
-    font-size:16px;
-    -webkit-text-size-adjust:100%;
-    height:100dvh;
-    display:flex;
-    justify-content:center;
+    background:var(--bg);color:var(--label);
+    font-family:var(--font);font-size:17px;line-height:1.29;letter-spacing:-.008em;
+    -webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;
+    height:100dvh;display:flex;justify-content:center;
   }
-  .shell{
-    flex:1;min-width:0;
-    display:flex;
-    flex-direction:column;
-    height:100%;
-  }
-  .headright{display:flex;align-items:center;gap:8px}
-  .add-top{display:none}
-  button,input,select,textarea{font:inherit;color:inherit}
-  button{cursor:pointer}
-  :focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+  button,input,select{font:inherit;color:inherit;letter-spacing:inherit}
+  button{cursor:pointer;-webkit-appearance:none;appearance:none}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  svg{display:block;flex:none}
 
-  /* ---------- masthead ---------- */
-  .masthead{
-    flex:none;
-    background:var(--ink);
-    color:var(--surface);
-    padding:calc(12px + env(safe-area-inset-top)) 16px 0;
-    border-bottom:6px solid var(--bus);
-  }
-  .masthead .row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-  .wordmark{
-    font-family:var(--cond);font-weight:700;font-size:23px;letter-spacing:.02em;
-  }
-  .wordmark span{color:var(--bus)}
-  .settings-btn{
-    background:none;border:1px solid #4A4D50;border-radius:2px;color:#C9C6BC;
-    font-size:13px;padding:5px 9px;
-  }
-  .stub{
-    display:flex;gap:0;margin:10px -16px 0;border-top:1px solid #34373A;
-  }
-  .stub div{
-    flex:1;padding:9px 16px 11px;border-right:1px solid #34373A;
-  }
-  .stub div:last-child{border-right:0}
-  .stub b{
-    display:block;font-family:var(--cond);font-weight:700;font-size:21px;line-height:1.1;
-    color:var(--surface);
-  }
-  .stub small{font-size:11.5px;color:#9A9C99;letter-spacing:.01em}
+  .shell{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;position:relative}
 
-  /* ---------- controls ---------- */
-  .controls{
-    flex:none;
-    display:flex;gap:6px;padding:12px 16px 4px;align-items:stretch;
+  /* glass surfaces */
+  .iconbtn,.pick select,.btn.plain{
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(24px) saturate(190%);
+    backdrop-filter:blur(24px) saturate(190%);
+    box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--lift);
   }
-  .controls select{
-    flex:1;min-width:0;background:var(--surface);border:1px solid var(--hair);
-    border-radius:2px;padding:9px 6px;font-size:14px;
-  }
-  .sort{
-    flex:none;width:42px;padding:0;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--cond);font-weight:700;font-size:19px;line-height:1;color:var(--lamp);
-  }
-  .ghost{
-    background:var(--surface);border:1px solid var(--ink);border-radius:2px;
-    padding:9px 10px;font-size:14px;white-space:nowrap;
+  .tinted{
+    background:var(--tint);color:var(--tint-ink);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.14),var(--lift);
   }
 
-  /* ---------- log ---------- */
-  main{
-    flex:1;min-height:0;
-    overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-    padding:0 16px 20px;
+  /* ===== navigation ===== */
+  .nav{flex:none;padding:calc(8px + env(safe-area-inset-top)) 16px 0}
+  .navrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px}
+  .title{margin:0;font-family:var(--display);font-size:32px;font-weight:700;letter-spacing:.011em;line-height:1.1}
+  .navbtns{display:flex;gap:10px}
+  .iconbtn{
+    width:42px;height:42px;flex:none;border:0;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;color:var(--label);
+    transition:transform .18s cubic-bezier(.3,1.4,.5,1);
   }
-  .month{
-    position:sticky;top:0;z-index:5;background:var(--ground);
-    display:flex;align-items:baseline;justify-content:space-between;
-    margin:18px 0 6px;padding:6px 0 5px;border-bottom:2px solid var(--ink);
-  }
-  .month:first-child{margin-top:8px}
-  .month h2{margin:0;font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.01em}
-  .month em{font-family:var(--cond);font-style:normal;font-weight:700;font-size:16px}
-  .month em i{
-    font-style:normal;font-weight:400;font-size:13.5px;color:var(--rubber);margin-left:8px;
-  }
+  .iconbtn svg{width:21px;height:21px}
+  .iconbtn:active,.pill:active,.btn:active{transform:scale(.94)}
+  .only-wide{display:none}
 
-  .trip{
-    display:flex;align-items:stretch;
-    background:var(--surface);border-bottom:1px solid var(--hair);
+  /* at-a-glance figures */
+  .summary{display:flex;margin:12px 0 0;padding:13px 0 12px;background:var(--card);border-radius:var(--r-card)}
+  .summary > div{flex:1;min-width:0;padding:0 14px;border-left:.5px solid var(--sep)}
+  .summary > div:first-child{border-left:0}
+  .summary b{
+    display:block;font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .tripmain{
-    flex:1;min-width:0;
-    display:grid;grid-template-columns:38px 58px 1fr auto;gap:11px;align-items:center;
-    text-align:left;background:none;border:0;padding:11px 4px 11px 10px;
-  }
-  .tripmain:active{background:#F0EDE4}
-  .dnum{font-family:var(--cond);font-weight:700;font-size:21px;line-height:1}
-  .dow{display:block;font-size:10.5px;color:var(--rubber);line-height:1.4}
-  .plate{
-    border:1px solid rgba(0,0,0,.35);border-radius:3px;
-    padding:6px 2px;text-align:center;
-    font-family:var(--cond);font-weight:700;font-size:17px;line-height:1;
-    overflow:hidden;text-overflow:ellipsis;
-  }
-  .school{font-size:14.5px;font-weight:500;line-height:1.25}
-  .meta{font-family:var(--cond);font-size:13.5px;color:var(--rubber);margin-top:2px}
-  .fee{font-family:var(--cond);font-weight:700;font-size:18px;text-align:right}
+  .summary small{display:block;font-size:13px;color:var(--label2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  .paidbox{
-    flex:none;width:48px;background:none;border:0;
-    display:flex;align-items:center;justify-content:center;
+  /* segmented control with a sliding glass thumb */
+  .seg{position:relative;display:flex;margin:12px 0 0;padding:3px;border-radius:999px;background:var(--fill)}
+  .seg::before{
+    content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;
+    background:var(--thumb);
+    box-shadow:inset 0 1px 0 var(--spec),0 0 0 .5px var(--rim),0 3px 8px rgba(0,0,0,.12);
+    transition:transform .38s cubic-bezier(.3,1.25,.45,1);
   }
-  .paidbox span{
-    width:24px;height:24px;border:1.5px solid var(--hair);border-radius:3px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:15px;line-height:1;color:transparent;
+  .seg button{
+    position:relative;z-index:1;flex:1;border:0;background:none;border-radius:999px;
+    padding:8px 6px;font-size:15px;font-weight:600;color:var(--label2);transition:color .2s;
   }
-  .paidbox[aria-pressed="true"] span{
-    background:var(--ink);border-color:var(--ink);color:var(--bus);
+  .seg button[aria-selected="true"]{color:var(--label)}
+
+  /* ===== filters ===== */
+  .controls{flex:none;display:flex;gap:8px;align-items:center;padding:12px 16px 2px;transition:box-shadow .2s}
+  .pick{position:relative;flex:1;min-width:0;display:block}
+  .pick select{
+    width:100%;height:42px;border:0;border-radius:999px;padding:0 30px 0 15px;
+    font-size:15px;font-weight:600;color:var(--label);
+    -webkit-appearance:none;appearance:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .paidbox:active span{border-color:var(--ink)}
-  .is-paid .fee,.is-paid .school{color:var(--rubber)}
+  .pick::after,.row.sel::after{
+    content:"";position:absolute;top:50%;width:9px;height:15px;transform:translateY(-50%);pointer-events:none;
+    background:var(--label2);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 15'%3E%3Cpath d='M1.2 5.2 4.5 1.9l3.3 3.3M1.2 9.8l3.3 3.3 3.3-3.3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 15'%3E%3Cpath d='M1.2 5.2 4.5 1.9l3.3 3.3M1.2 9.8l3.3 3.3 3.3-3.3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
+  .pick::after{right:14px}
+  .sort svg{transition:transform .3s cubic-bezier(.3,1.3,.5,1)}
+  .sort.asc svg{transform:rotate(180deg)}
 
   .bulk{
-    flex:none;
-    display:block;width:calc(100% - 32px);margin:6px 16px 0;
-    background:none;border:1px dashed var(--hair);border-radius:2px;
-    padding:9px;font-size:13.5px;color:var(--rubber);
+    flex:none;display:block;margin:10px 16px 0;padding:11px 16px;border:0;border-radius:999px;
+    background:var(--tint-soft);color:var(--label);font-size:15px;font-weight:600;text-align:center;
   }
-  .bulk:active{border-color:var(--ink);color:var(--ink)}
+  .warn{flex:none;margin:10px 16px 0;padding:12px 16px;border-radius:16px;background:var(--card);font-size:14px;line-height:1.4;color:var(--label2)}
+  .warn strong{color:var(--orange)}
 
-  .empty{
-    background:var(--surface);border:1px dashed var(--hair);
-    padding:28px 20px;text-align:center;color:var(--rubber);
-    font-size:14.5px;line-height:1.5;margin-top:18px;
+  /* ===== the list ===== */
+  main{
+    flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+    padding:2px 16px calc(112px + env(safe-area-inset-bottom));
   }
+  /* scroll edge: once rows slide under the bars, lay down a soft uniform edge */
+  body.scrolled main{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14px);mask-image:linear-gradient(to bottom,transparent 0,#000 14px)}
+  body.scrolled .controls{box-shadow:0 .5px 0 var(--sep)}
 
-  /* ---------- add button ---------- */
-  .addbar{
-    flex:none;
-    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
-    background:var(--ground);
-    border-top:1px solid var(--hair);
+  .group{margin-top:10px}
+  .month{
+    position:sticky;top:0;z-index:5;
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin:0 -16px;padding:10px 22px 8px;
+    background:var(--bg-glass);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
   }
-  .add{
-    width:100%;background:var(--bus);color:var(--ink);
-    border:0;border-bottom:4px solid #B98C04;border-radius:3px;
-    font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.02em;
-    padding:14px;
-  }
-  .add:active{border-bottom-width:1px;transform:translateY(3px)}
+  .month h2{margin:0;font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.01em}
+  .month em{font-style:normal;font-size:15px;font-weight:600;color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .month em i{font-style:normal;font-weight:600;color:var(--orange);margin-left:8px}
 
-  /* ---------- sheet ---------- */
-  .scrim{
-    position:fixed;inset:0;z-index:40;background:rgba(23,25,28,.55);
-    display:none;
+  .card{background:var(--card);border-radius:var(--r-card);overflow:hidden}
+  .trip{position:relative;display:flex;align-items:stretch}
+  .trip + .trip::before{content:"";position:absolute;top:0;left:62px;right:0;height:.5px;background:var(--sep);z-index:1}
+  .tripmain{
+    flex:1;min-width:0;display:grid;grid-template-columns:32px 50px 1fr auto;gap:12px;align-items:center;
+    padding:11px 2px 11px 16px;background:none;border:0;text-align:left;transition:background .15s;
   }
-  .scrim.on{display:block}
+  .tripmain:active{background:var(--fill)}
+  .date{display:flex;flex-direction:column;align-items:center;line-height:1}
+  .dow{display:block;font-size:11px;font-weight:600;color:var(--red);margin-bottom:4px}
+  .dnum{font-family:var(--display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .plate{
+    height:30px;border-radius:9px;padding:0 4px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    box-shadow:inset 0 0 0 .5px var(--plate-rim),inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .mid{min-width:0}
+  .school{display:block;font-size:17px;font-weight:600;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta{display:block;font-size:14px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta span + span{margin-left:9px}
+  .fee{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;text-align:right;white-space:nowrap}
+
+  /* Reminders-style completion circle */
+  .paidbox{flex:none;width:50px;padding:0 14px 0 6px;border:0;background:none;display:flex;align-items:center;justify-content:center}
+  .paidbox span{
+    position:relative;width:26px;height:26px;border-radius:50%;font-size:0;color:transparent;
+    box-shadow:inset 0 0 0 1.6px var(--label3);transition:background .2s,box-shadow .2s;
+  }
+  .paidbox span::after{
+    content:"";position:absolute;left:9px;top:5.5px;width:6px;height:11px;
+    border:solid #fff;border-width:0 2.3px 2.3px 0;
+    transform:rotate(45deg) scale(.3);opacity:0;
+    transition:transform .3s cubic-bezier(.3,1.6,.5,1),opacity .12s;
+  }
+  .paidbox[aria-pressed="true"] span{background:var(--green);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+  .paidbox[aria-pressed="true"] span::after{opacity:1;transform:rotate(45deg) scale(1)}
+  .is-paid .school,.is-paid .fee{color:var(--label2)}
+
+  .empty{margin:64px 28px;text-align:center;color:var(--label2);font-size:15px;line-height:1.47}
+  .empty strong{color:var(--label);font-weight:600}
+
+  /* floating primary action */
+  .fab{
+    position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));z-index:10;
+    display:flex;justify-content:center;pointer-events:none;
+  }
+  .pill{
+    pointer-events:auto;display:inline-flex;align-items:center;gap:8px;height:54px;padding:0 28px 0 22px;
+    border:0;border-radius:999px;font-size:17px;font-weight:600;letter-spacing:-.01em;
+    transition:transform .18s cubic-bezier(.3,1.4,.5,1);
+  }
+  .pill.tinted{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.14),var(--float)}
+  .pill svg{width:20px;height:20px}
+
+  /* ===== sheets ===== */
+  .scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .3s}
+  .scrim.on{opacity:1;pointer-events:auto}
   .sheet{
-    position:fixed;left:0;right:0;bottom:0;z-index:41;
-    max-height:92vh;overflow-y:auto;
-    background:var(--surface);border-top:6px solid var(--bus);
-    border-radius:10px 10px 0 0;
-    padding:16px 16px calc(24px + env(safe-area-inset-bottom));
-    transform:translateY(100%);
-    transition:transform .22s ease;
+    position:fixed;z-index:41;left:8px;right:8px;bottom:8px;
+    max-height:calc(100dvh - env(safe-area-inset-top) - 28px);
+    overflow-y:auto;overscroll-behavior:contain;
+    background:var(--sheet);
+    -webkit-backdrop-filter:blur(44px) saturate(180%);backdrop-filter:blur(44px) saturate(180%);
+    border-radius:36px;
+    box-shadow:inset 0 1px 0 var(--spec),0 0 0 .5px var(--rim),0 -10px 44px rgba(0,0,0,.2);
+    padding:6px 16px calc(22px + env(safe-area-inset-bottom));
+    transform:translateY(calc(100% + 20px));visibility:hidden;
+    transition:transform .44s cubic-bezier(.2,.9,.25,1),visibility 0s linear .44s;
   }
-  .sheet.on{transform:translateY(0)}
-  @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
-  .sheet h3{margin:2px 0 14px;font-family:var(--cond);font-weight:700;font-size:20px}
-  label{display:block;font-size:12.5px;color:var(--rubber);margin:0 0 4px}
-  .field{margin-bottom:13px}
-  .field input,.field select,.field textarea{
-    width:100%;background:#fff;border:1px solid var(--hair);border-radius:2px;
-    padding:11px 10px;font-size:16px;
+  .sheet.on{transform:none;visibility:visible;transition:transform .44s cubic-bezier(.2,.9,.25,1),visibility 0s}
+  .sheet::before{content:"";display:block;width:36px;height:5px;border-radius:3px;background:var(--label3);margin:3px auto 5px}
+  .sheethead{
+    position:sticky;top:-6px;z-index:3;
+    display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;
+    margin:0 -16px;padding:6px 16px 10px;background:var(--sheet);
   }
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-  .colorwrap{display:flex;gap:9px;align-items:center}
-  .colorwrap input{flex:1}
-  #swatch{width:44px;height:44px;flex:none;border:1px solid var(--ink);border-radius:3px;background:#ccc}
-  .check{
-    display:flex;align-items:center;gap:10px;margin:2px 0 4px;
-    font-size:14.5px;color:var(--ink);
-  }
-  .check input{width:21px;height:21px;flex:none;accent-color:var(--ink)}
-  .sheet-actions{display:flex;gap:10px;margin-top:18px}
-  .save{
-    flex:1;background:var(--ink);color:var(--surface);border:0;border-radius:3px;
-    font-family:var(--cond);font-weight:700;font-size:18px;padding:13px;
-  }
-  .del{
-    background:none;border:1px solid var(--lamp);color:var(--lamp);border-radius:3px;
-    padding:13px 14px;font-size:14.5px;
-  }
-  .cancel{background:none;border:1px solid var(--hair);border-radius:3px;padding:13px 14px;font-size:14.5px}
-  .datarow{display:flex;gap:10px;margin-top:10px}
-  .datarow .cancel{flex:1;padding:11px 8px}
-  .hint{font-size:12.5px;color:var(--rubber);line-height:1.45;margin:10px 0 0}
-  .warn{flex:none;background:#FDF3E3;border:1px solid #E8C67A;padding:10px 12px;font-size:13px;margin:12px 16px 0}
+  .sheethead h3{margin:0;text-align:center;font-family:var(--display);font-size:17px;font-weight:600;line-height:1.25}
+  .sheethead h3 .saved{display:block;font-size:12px;font-weight:600;color:var(--green)}
 
-  /* ---------- pointer, not finger ---------- */
+  .sheet .form{margin-top:20px}
+  .sheethead + .form{margin-top:4px}
+  .form{background:var(--card);border-radius:var(--r-card);overflow:hidden}
+  .row{
+    position:relative;display:flex;align-items:center;gap:12px;
+    min-height:50px;padding:0 16px;width:100%;
+  }
+  .row + .row::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+  .row > label{flex:none;font-size:17px}
+  .row input,.row select{
+    flex:1;min-width:0;border:0;background:none;outline:none;
+    padding:13px 0;font-size:17px;text-align:right;color:var(--label);
+  }
+  .row input::placeholder{color:var(--label3)}
+  .row input[type=date],.row input[type=time]{flex:0 1 auto;margin-left:auto;width:auto;color:var(--label)}
+  .row input::-webkit-date-and-time-value{text-align:right}
+  .row input::-webkit-calendar-picker-indicator{opacity:.45;margin-left:6px}
+  .row input[type=number]{-moz-appearance:textfield}
+  .row input[type=number]::-webkit-inner-spin-button,.row input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .row select{-webkit-appearance:none;appearance:none;text-align-last:right;padding-right:20px;color:var(--label2)}
+  .row.sel::after{right:16px}
+  .row:focus-within{background:var(--tint-soft)}
+  .row:has(input.err){background:color-mix(in srgb,var(--red) 12%,transparent)}
+  .row input.err::placeholder{color:var(--red)}
+  #swatch{flex:none;width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 .5px var(--plate-rim),inset 0 1px 0 rgba(255,255,255,.4)}
+
+  /* switches */
+  .toggle{cursor:pointer}
+  .toggle > span{flex:1;font-size:17px;padding:13px 0;line-height:1.25}
+  .toggle input{
+    flex:none;width:51px;height:31px;margin:0;padding:0;border-radius:999px;cursor:pointer;
+    -webkit-appearance:none;appearance:none;background:var(--fill2);position:relative;transition:background .25s;
+  }
+  .toggle input::after{
+    content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;
+    box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16),0 0 0 .5px rgba(0,0,0,.04);
+    transition:transform .3s cubic-bezier(.3,1.3,.5,1);
+  }
+  .toggle input:checked{background:var(--green)}
+  .toggle input:checked::after{transform:translateX(20px)}
+  .toggle:focus-within{background:none}
+  .toggle input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* settings-style action rows */
+  .row.link{border:0;background:none;text-align:left;color:var(--label);font-size:17px;padding-left:14px}
+  .row.link:active{background:var(--fill)}
+  .row.link + .row.link::before{left:58px}
+  .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 .5px rgba(0,0,0,.08)}
+  .ic svg{width:18px;height:18px}
+  .row.link .lbl{flex:1}
+  .chev{
+    flex:none;width:8px;height:14px;background:var(--label3);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.5 1.5 6.5 7l-5 5.5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.5 1.5 6.5 7l-5 5.5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
+
+  .foot{margin:7px 16px 0;font-size:13px;line-height:1.38;color:var(--label2)}
+  .actions{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+  .actions:empty{display:none}
+  .btn{
+    width:100%;height:52px;border:0;border-radius:999px;font-size:17px;font-weight:600;
+    transition:transform .18s cubic-bezier(.3,1.4,.5,1),opacity .2s;
+  }
+  .btn.plain{color:var(--label)}
+  .btn.destructive{background:var(--card);color:var(--red)}
+  .btn:disabled{opacity:.38;pointer-events:none}
+
+  /* ===== pointer devices ===== */
   @media (hover:hover){
-    .tripmain:hover{background:#F3F0E7}
-    .paidbox:hover span{border-color:var(--rubber)}
-    .ghost:hover{background:#fff;border-color:var(--ink)}
-    .settings-btn:hover{border-color:#7C7F82;color:var(--surface)}
-    .bulk:hover{border-color:var(--ink);color:var(--ink)}
-    .add:hover,.add-top:hover{background:#FFC61A}
-    .save:hover{background:#2A2E32}
-    .cancel:hover{border-color:var(--ink)}
-    .del:hover{background:#FCEDE9}
+    .tripmain:hover,.row.link:hover{background:var(--fill)}
+    .iconbtn:hover,.pick select:hover,.btn.plain:hover{filter:brightness(1.04)}
+    .tinted:hover{filter:brightness(1.05)}
+    .paidbox:hover span{box-shadow:inset 0 0 0 1.6px var(--label2)}
+    .paidbox[aria-pressed="true"]:hover span{box-shadow:none}
+    .seg button[aria-selected="false"]:hover{color:var(--label)}
   }
 
-  /* ---------- wide screens ---------- */
+  /* ===== wide screens ===== */
   @media (min-width:760px){
-    .shell{
-      max-width:1020px;
-      border-left:1px solid var(--hair);
-      border-right:1px solid var(--hair);
-      background:var(--ground);
-    }
-    .masthead{padding:14px 24px 0}
-    .wordmark{font-size:26px}
-    .add-top{
-      display:inline-block;
-      background:var(--bus);color:var(--ink);border:0;border-radius:2px;
-      font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.02em;
-      padding:8px 16px;
-    }
-    .stub{margin:12px -24px 0}
-    .stub div{padding:10px 24px 12px;flex:0 1 auto;min-width:170px}
-    .stub div:last-child{flex:1}
-    .stub b{font-size:23px}
-
-    .controls{padding:14px 24px 4px;gap:8px}
-    .controls select{flex:0 1 240px;font-size:14.5px;padding:9px 10px}
-    .ghost{padding:9px 14px;font-size:14.5px}
+    .shell{max-width:780px}
+    .nav{padding:20px 28px 0}
+    .title{font-size:34px}
+    .only-wide{display:inline-flex}
+    .controls{padding:14px 28px 2px}
+    .pick{flex:0 1 230px}
     #btnExport{margin-left:auto}
-    .bulk{width:calc(100% - 48px);margin:8px 24px 0;padding:10px}
-
-    main{padding:0 24px 24px}
-    .month{margin:20px 0 6px}
-    .month h2{font-size:18px}
-
-    .tripmain{
-      grid-template-columns:74px 76px 1fr 130px;
-      gap:16px;padding:12px 6px 12px 14px;
-    }
-    .date{display:flex;align-items:baseline;gap:7px}
-    .dow{display:inline;font-size:13px}
-    .dnum{font-size:22px}
-    .plate{font-size:18px;padding:7px 3px}
-    .school{font-size:15px}
-    .meta{font-size:14px}
-    .fee{font-size:19px}
-    .paidbox{width:58px}
-    .paidbox span{width:26px;height:26px;font-size:16px}
-
-    .addbar{display:none}
-
-    /* sheets become centred dialogs rather than thumb-reachable drawers */
+    .bulk{margin:10px 28px 0;align-self:flex-start;padding:10px 20px}
+    .warn{margin:10px 28px 0}
+    main{padding:2px 28px 40px}
+    .month{margin:0 -28px;padding:12px 34px 8px}
+    .fab{display:none}
+    .tripmain{grid-template-columns:38px 62px 1fr 120px;gap:16px;padding:12px 4px 12px 20px}
+    .trip + .trip::before{left:74px}
+    .plate{height:32px;font-size:15px}
     .sheet{
-      top:50%;bottom:auto;left:50%;right:auto;
-      width:min(580px,calc(100vw - 48px));
-      max-height:86vh;
-      border-radius:6px;
-      padding:20px 22px 24px;
-      transform:translate(-50%,-46%);
-      opacity:0;pointer-events:none;
-      transition:transform .18s ease,opacity .18s ease;
-      box-shadow:0 24px 60px rgba(23,25,28,.28);
+      left:50%;right:auto;bottom:auto;top:50%;width:min(560px,calc(100vw - 48px));max-height:86vh;
+      border-radius:30px;padding:16px 18px 24px;opacity:0;
+      transform:translate(-50%,-47%) scale(.97);
+      box-shadow:inset 0 1px 0 var(--spec),0 0 0 .5px var(--rim),0 30px 80px rgba(0,0,0,.3);
+      transition:transform .34s cubic-bezier(.2,.9,.25,1),opacity .22s,visibility 0s linear .34s;
     }
-    .sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
-    @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
-    .sheet h3{font-size:22px}
-    .field input,.field select,.field textarea{font-size:15px;padding:10px}
+    .sheet.on{opacity:1;transform:translate(-50%,-50%);transition:transform .34s cubic-bezier(.2,.9,.25,1),opacity .22s,visibility 0s}
+    .sheet::before{display:none}
+    .sheethead{margin:0 -18px;padding:4px 18px 10px;top:-16px}
   }
 
-  /* ---------- printed report ---------- */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.01ms !important}
+  }
+
+  /* ===== printed record — a document, not an app screen ===== */
   #report{display:none}
   @media print{
     html,body{height:auto;overflow:visible;display:block}
     body{background:#fff;padding:0}
     .shell,.scrim,.sheet{display:none !important}
-    .warn{display:none !important}
-    #report{display:block;color:#000;font-family:var(--body)}
+    #report{display:block;color:#000;font-family:var(--font)}
     @page{margin:.6in}
     .rpt-head{border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:4px}
-    .rpt-head h1{font-family:var(--cond);font-size:26px;margin:0 0 3px;font-weight:700}
+    .rpt-head h1{font-family:var(--display);font-size:26px;margin:0 0 3px;font-weight:700}
     .rpt-head .who{font-size:13px;line-height:1.5}
     .rpt-head .period{font-size:13px;margin-top:6px}
     table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px}
-    th{
-      text-align:left;font-family:var(--cond);font-weight:700;font-size:13px;
-      border-bottom:1.5px solid #000;padding:5px 6px;
-    }
+    th{text-align:left;font-weight:700;font-size:13px;border-bottom:1.5px solid #000;padding:5px 6px}
     td{padding:6px;border-bottom:.5px solid #bbb;vertical-align:top}
     td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
     tfoot td{border-top:1.5px solid #000;border-bottom:0;font-weight:700;font-size:14px;padding-top:8px}
@@ -334,163 +407,394 @@
     .sign{margin-top:46px;display:flex;gap:40px;font-size:12px}
     .sign div{flex:1;border-top:1px solid #000;padding-top:5px}
   }
+
+  @media (max-width:400px){
+    .summary b{font-size:19px}
+    .summary > div{padding:0 11px}
+  }
+
+  .summary > div.wide-only{display:none}
+  @media (min-width:760px){ .summary > div.wide-only{display:block} }
+  .seg:has(#tabSchools[aria-selected="true"])::before{transform:translateX(100%)}
+  @media print{
+    .rpt-top{display:flex;justify-content:space-between;align-items:flex-start;gap:28px}
+    .rpt-meta{text-align:right;font-size:12.5px;line-height:1.6;white-space:nowrap}
+    .billto{margin-top:14px;font-size:14px}
+    .billto span{display:block;font-size:11.5px;color:#555;margin-bottom:1px}
+    td.note{padding-top:0;color:#444;font-size:11.5px}
+  }
+
+  /* ---- pass 2: rows give the name the full width; the bus becomes a tag on the second line ---- */
+  .tripmain{
+    grid-template-columns:30px auto minmax(0,1fr) auto;grid-template-rows:auto auto;
+    column-gap:8px;row-gap:3px;padding:10px 2px 10px 16px;
+  }
+  .date{grid-column:1;grid-row:1 / 3;margin-right:6px}
+  .dow{color:var(--label2)}
+  .mid{display:contents}
+  .school{grid-column:2 / 4;grid-row:1;align-self:end}
+  .plate{
+    grid-column:2;grid-row:2;align-self:center;
+    height:20px;min-width:30px;padding:0 6px;border-radius:6px;font-size:12px;
+  }
+  .meta{grid-column:3;grid-row:2;margin-top:0;align-self:center}
+  .fee{grid-column:4;grid-row:1 / 3;padding-left:6px}
+  .trip + .trip::before{left:60px}
+
+  .month{background:var(--bg-glass-hi);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px)}
+  .month h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .month em{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;flex:none}
+  .month em i{margin-left:0;font-size:13px}
+  body.scrolled main{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 8px);mask-image:linear-gradient(to bottom,transparent 0,#000 8px)}
+
+  .controls{gap:7px}
+  .pick select{padding:0 26px 0 13px}
+  .pick::after{right:11px}
+
+  .row input[list]::-webkit-calendar-picker-indicator{display:none !important}
+  .row input[list]::-webkit-list-button{display:none !important}
+
+  @media (min-width:760px){
+    .tripmain{grid-template-columns:36px auto minmax(0,1fr) 120px;column-gap:10px;padding:12px 4px 12px 20px}
+    .trip + .trip::before{left:72px}
+    .plate{height:22px;font-size:13px}
+    .month em{flex-direction:row;align-items:baseline;gap:10px}
+  }
+
+  /* ---- pass 3: a little more room for the name on narrow phones ---- */
+  .school{font-size:16px}
+  .fee{font-size:16px}
+  .paidbox{width:46px;padding:0 12px 0 4px}
+  @media (min-width:760px){ .school,.fee{font-size:17px} .paidbox{width:52px;padding:0 14px 0 6px} }
+
+  /* ================= one app, two roles ================= */
+  .stage{flex:1;min-width:0;height:100%;display:flex;justify-content:center}
+  body[data-role="sub"] .mgr-only,
+  body[data-role="none"] .mgr-only{display:none !important}
+  body[data-role="manager"] .sub-only{display:none !important}
+
+  /* first launch */
+  #sheetWelcome::before{display:none}
+  .welcome-hero{text-align:center;padding:24px 8px 4px}
+  .appicon{
+    width:86px;height:86px;margin:0 auto;border-radius:21px;color:#1C1C1E;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(#FFDE5C,#FFBC00);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 .5px rgba(0,0,0,.12),0 10px 26px rgba(255,188,0,.35);
+  }
+  .appicon svg{width:50px;height:50px}
+  .welcome-hero h2{font-family:var(--display);font-size:28px;font-weight:700;letter-spacing:.01em;margin:18px 0 6px;text-wrap:balance}
+  .welcome-hero p{margin:0;color:var(--label2);font-size:16px;line-height:1.4}
+  .choice{
+    display:flex;align-items:center;gap:14px;width:100%;border:0;text-align:left;
+    background:var(--card);color:var(--label);border-radius:var(--r-card);padding:16px;margin-top:12px;
+    box-shadow:inset 0 0 0 2px transparent;transition:box-shadow .2s;
+  }
+  .choice:first-of-type{margin-top:22px}
+  .choice[aria-checked="true"]{box-shadow:inset 0 0 0 2.5px var(--tint)}
+  .choice .ic{width:46px;height:46px;border-radius:13px;flex:none}
+  .choice .ic svg{width:26px;height:26px}
+  .choice b{display:block;font-size:17px;font-weight:600}
+  .choice small{display:block;font-size:14px;color:var(--label2);margin-top:3px;line-height:1.35}
+  .ring{flex:none;position:relative;width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 1.6px var(--label3);transition:background .2s}
+  .ring::after{
+    content:"";position:absolute;left:8.5px;top:5px;width:5.5px;height:10px;
+    border:solid var(--tint-ink);border-width:0 2.2px 2.2px 0;transform:rotate(45deg) scale(.3);opacity:0;
+    transition:transform .3s cubic-bezier(.3,1.6,.5,1),opacity .12s;
+  }
+  .choice[aria-checked="true"] .ring{background:var(--tint);box-shadow:none}
+  .choice[aria-checked="true"] .ring::after{opacity:1;transform:rotate(45deg) scale(1)}
+  #welcomeFound{text-align:center;margin-top:16px}
+
+  /* settings */
+  .head{margin:22px 16px 7px;font-size:13px;color:var(--label2)}
+  .sheet .head + .form{margin-top:0}
+  .row.radio .ck{margin-left:auto;color:var(--blue);opacity:0;transition:opacity .15s}
+  .row.radio .ck svg{width:20px;height:20px}
+  .row.radio[aria-checked="true"] .ck{opacity:1}
+
+  /* ===== medium top: room for the list without squeezing anything ===== */
+  .nav{padding:calc(8px + env(safe-area-inset-top)) 16px 0}
+  .navrow{min-height:40px;gap:10px}
+  .title{font-size:26px;letter-spacing:.008em}
+  .navrow .seg{flex:1;margin:0;padding:3px}
+  .navrow .seg button{padding:7px 6px;font-size:15px}
+  .navbtns{gap:8px}
+  .nav .iconbtn{width:40px;height:40px}
+  .nav .iconbtn svg{width:19px;height:19px}
+
+  .statcard{display:flex;align-items:stretch;margin:10px 0 0;padding:7px 0;background:var(--card);border-radius:18px}
+  .statcard .stat{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:2px 14px;border-left:.5px solid var(--sep)}
+  .statcard .stat:first-child{border-left:0}
+  .statcard b{display:block;font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .statcard small{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--label2);margin-top:2px;white-space:nowrap}
+  .statcard .stat-owed{padding:0 6px}
+  .owedbtn{width:100%;height:100%;border:0;background:none;color:inherit;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:3px 8px;border-radius:12px;transition:background .2s,transform .18s}
+  .owedbtn:disabled{cursor:default}
+  .owedbtn.can{background:var(--tint-soft)}
+  .owedbtn.can:active{transform:scale(.97)}
+  .owedbtn .mark{display:none}
+  .owedbtn.can .mark{display:inline-flex;width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center;flex:none}
+  .owedbtn.can .mark svg{width:10px;height:10px}
+  .statcard .wide-only{display:none}
+
+  .controls{padding:10px 16px 4px;gap:8px}
+  .pick select{height:40px;font-size:15px;padding:0 28px 0 14px}
+  .pick::after{right:12px}
+  .controls .iconbtn{width:40px;height:40px}
+  .controls .iconbtn svg{width:19px;height:19px}
+
+  main{padding:0 16px calc(100px + env(safe-area-inset-bottom))}
+  .group{margin-top:6px}
+  .month{margin:0 -16px;padding:10px 22px 7px}
+  .month h2{font-size:18px}
+  .month em{flex-direction:row;align-items:baseline;gap:8px;font-size:14px}
+  .month em i{font-size:14px}
+  .pill{height:52px;padding:0 26px 0 20px;font-size:17px}
+
+  @media (hover:hover){ .owedbtn.can:hover{filter:brightness(.97)} }
+  @media (min-width:760px){
+    .nav{padding:18px 28px 0}
+    .title{font-size:30px}
+    .navrow .seg{flex:0 1 380px}
+    .statcard .wide-only{display:flex}
+    .controls{padding:12px 28px 4px}
+    .pick{flex:0 1 230px}
+    main{padding:0 28px 36px}
+    .month{margin:0 -28px;padding:11px 34px 7px}
+  }
+
+  /* the count is always short; give its width to the money */
+  .statcard .stat:nth-child(2){flex:.6}
+  .statcard .stat-owed{flex:1.2}
+  .controls{gap:7px}
+  .pick select{font-size:14px;padding:0 26px 0 12px}
+  .pick::after{right:11px}
+  @media (min-width:760px){ .statcard .stat:nth-child(2){flex:.7} .pick select{font-size:15px;padding:0 28px 0 14px} }
+
+  /* ===== Create invoice ===== */
+  .fab{gap:10px;padding:0 16px}
+  .fab .pill{flex:0 1 auto;min-width:0;padding:0 20px 0 16px;font-size:16px;white-space:nowrap}
+  .pill.glassy{
+    background:var(--glass-thick);color:var(--label);
+    -webkit-backdrop-filter:blur(30px) saturate(190%);backdrop-filter:blur(30px) saturate(190%);
+    box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--float);
+  }
+  .controls .invoice{display:none}
+  @media (hover:hover){ .pill.glassy:hover{filter:brightness(1.04)} }
+  @media (min-width:760px){
+    .controls .invoice{
+      display:inline-flex;height:40px;padding:0 16px 0 12px;font-size:15px;
+      box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--lift);
+    }
+    .controls .invoice svg{width:18px;height:18px}
+  }
+  .sheet::before{width:40px;height:5px;margin:4px auto 6px}
+
+  /* ===== sort: says what order you're looking at, and sits above the dates ===== */
+  .sortchip{
+    flex:none;height:40px;display:inline-flex;align-items:center;gap:5px;padding:0 11px 0 13px;
+    border:0;border-radius:999px;font-size:14px;font-weight:600;color:var(--label);white-space:nowrap;
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(24px) saturate(190%);backdrop-filter:blur(24px) saturate(190%);
+    box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--lift);
+    transition:transform .18s cubic-bezier(.3,1.4,.5,1);
+  }
+  .sortchip:active{transform:scale(.95)}
+  .sortchip svg{width:15px;height:15px;color:var(--label2)}
+  .sortchip .wide-word{display:none}
+  @media (hover:hover){ .sortchip:hover{filter:brightness(1.04)} }
+  @media (min-width:760px){ .sortchip .wide-word{display:inline} .sortchip{padding:0 13px 0 15px;font-size:15px}
+    .controls .invoice{flex:none;white-space:nowrap} .pick{flex:0 1 210px} }
 </style>
 </head>
-<body>
+<body data-role="none">
 
+
+
+<div class="stage">
 <div class="shell">
-<header class="masthead">
-  <div class="row">
-    <div class="wordmark">Route <span>Log</span></div>
-    <div class="headright">
-      <button class="add-top" id="btnAddTop">Log a trip</button>
-      <button class="settings-btn" id="btnSettings">Your details</button>
+<header class="nav">
+  <div class="navrow">
+    <h1 class="title sub-only" id="viewTitle">My trips</h1>
+    <div class="seg mgr-only" role="tablist" aria-label="Which side of the books">
+      <button role="tab" id="tabDrivers" data-go="drivers" aria-selected="true">Pay drivers</button>
+      <button role="tab" id="tabSchools" data-go="schools" aria-selected="false">Bill schools</button>
+    </div>
+    <div class="navbtns">
+      <button class="iconbtn tinted only-wide" id="btnAddTop" aria-label="Log a trip" title="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="iconbtn" id="btnSettings" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 3.9-5.4 7-5.4s5.8 1.8 7 5.4"/></svg></button>
     </div>
   </div>
-  <div class="stub">
-    <div><b id="sMonth">$0</b><small id="sMonthLbl">this month</small></div>
-    <div><b id="sTrips">0</b><small>trips logged</small></div>
-    <div><b id="sAll">$0</b><small id="sAllLbl">still owed</small></div>
+  <div class="statcard">
+    <div class="stat"><b id="sTotal">$0</b><small id="sTotalLbl">earned</small></div>
+    <div class="stat"><b id="sCount">0</b><small id="sCountLbl">trips</small></div>
+    <div class="stat stat-owed"><button class="owedbtn" id="bulkPay" disabled><b id="sOwed">$0</b><small><span id="sOwedLbl">all settled</span><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></small></button></div>
+    <div class="stat wide-only mgr-only"><b id="sMargin">$0</b><small>margin, billed less pay</small></div>
   </div>
 </header>
 
-<div id="storageWarn" class="warn" hidden>This browser is blocking storage, so trips won't survive a reload. Private browsing is the usual cause — open the file in a normal window, or use <strong>Back up</strong> under Your details before you close it.</div>
+<div id="storageWarn" class="warn" hidden><strong>Not saving.</strong> This browser is blocking storage, so nothing will survive a reload. Private browsing is the usual cause. Open it in a normal window, or use Back up in Settings before you close it.</div>
 
 <div class="controls">
-  <select id="fSchool" aria-label="Filter by school"><option value="">All schools</option></select>
-  <select id="fMonth" aria-label="Filter by month"><option value="">All dates</option></select>
-  <button class="ghost" id="btnExport">PDF</button>
-  <button class="ghost sort" id="btnSort" aria-label="Newest first. Tap to show oldest first."><span id="sortArrow" aria-hidden="true">↓</span></button>
+  <button class="sortchip sort" id="btnSort" aria-label="Newest first. Tap to show oldest first." title="Newest first. Tap to flip."><span><span id="sortWord">Newest</span><span class="wide-word"> first</span></span><span id="sortArrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15M6 13.5l6 6 6-6"/></svg></span></button>
+  <span class="pick"><select id="fWho" aria-label="Filter"><option value="">All schools</option></select></span>
+  <span class="pick"><select id="fMonth" aria-label="Filter by month"><option value="">All dates</option></select></span>
+  <button class="pill glassy invoice" id="btnExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="exportLbl">Create invoice</span></button>
 </div>
-
-<button class="bulk" id="bulkPay" hidden></button>
 
 <main id="log"></main>
 
-<div class="addbar"><button class="add" id="btnAdd">Log a trip</button></div>
-
+<div class="fab"><button class="pill glassy" id="btnInvoice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="invoiceLbl">Create invoice</span></button><button class="pill tinted" id="btnAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Log a trip</span></button></div>
 </div><!-- /shell -->
+</div><!-- /stage -->
+
+
 
 <div class="scrim" id="scrim"></div>
 
-<!-- trip sheet -->
+<!-- first launch -->
+<section class="sheet" id="sheetWelcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="welcome-hero">
+    <div class="appicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="14.5" rx="3"/><path d="M4.5 10.5h15M8 20.5V18M16 20.5V18"/><circle cx="8.3" cy="14.3" r="1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="14.3" r="1" fill="currentColor" stroke="none"/></svg></div>
+    <h2 id="welcomeTitle">Welcome to Route Log</h2>
+    <p>How will you use it?</p>
+  </div>
+  <button class="choice" id="roleSub" role="radio" aria-checked="false">
+    <span class="ic" style="background:#FFCC00;color:#1C1C1E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="14.5" rx="3"/><path d="M4.5 10.5h15M8 20.5V18M16 20.5V18"/><circle cx="8.3" cy="14.3" r="1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="14.3" r="1" fill="currentColor" stroke="none"/></svg></span>
+    <span><b>I drive</b><small>Log the trips you cover and send each school a record of what you're owed.</small></span>
+    <span class="ring" aria-hidden="true"></span>
+  </button>
+  <button class="choice" id="roleMgr" role="radio" aria-checked="false">
+    <span class="ic" style="background:#3A3A3C;color:#FFD60A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.8-3.2 2.9-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="16.6" cy="8.8" r="2.4"/><path d="M15.6 13.9c2.4-.3 4.3 1.2 5 4.5"/></svg></span>
+    <span><b>I manage subs</b><small>Track routes your subs drive across schools, pay the drivers, and bill the schools.</small></span>
+    <span class="ring" aria-hidden="true"></span>
+  </button>
+  <p class="foot" id="welcomeFound" hidden></p>
+  <div class="actions">
+    <button class="btn tinted" id="btnWelcome" disabled>Continue</button>
+  </div>
+  <p class="foot" style="text-align:center">You can switch any time in Settings.</p>
+</section>
+
+<!-- log / edit -->
 <section class="sheet" id="sheetTrip" role="dialog" aria-modal="true" aria-labelledby="tripTitle">
-  <h3 id="tripTitle">Log a trip</h3>
-  <div class="field">
-    <label for="fDate">Date</label>
-    <input type="date" id="fDate">
+  <div class="sheethead">
+    <button class="iconbtn" id="btnCancelTrip" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <h3 id="tripTitle">Log a trip</h3>
+    <button class="iconbtn tinted" id="btnSave" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
-  <div class="field">
-    <label for="fSchoolIn">School</label>
-    <input type="text" id="fSchoolIn" list="schoolList" placeholder="Lincoln Elementary" autocomplete="off">
-    <datalist id="schoolList"></datalist>
+  <div class="form">
+    <div class="row"><label for="fDate">Date</label><input type="date" id="fDate"></div>
+    <div class="row"><label for="fSchoolIn">School</label><input type="text" id="fSchoolIn" list="schoolList" placeholder="Lincoln Elementary" autocomplete="off"></div>
+    <div class="row"><label for="fRoute">Route</label><input type="text" id="fRoute" placeholder="Optional" autocomplete="off"></div>
+    <div class="row mgr-only"><label for="fDriverIn">Driven by</label><input type="text" id="fDriverIn" list="driverList" placeholder="Dana Okafor" autocomplete="off"></div>
   </div>
-  <div class="two">
-    <div class="field">
-      <label for="fBus">Bus number</label>
-      <input type="text" id="fBus" inputmode="numeric" placeholder="217">
-    </div>
-    <div class="field">
-      <label for="fRun">Run</label>
-      <select id="fRun">
+  <p class="foot" id="autoHint" hidden>Filled in from the last time this route ran. Change anything that's different today.</p>
+  <div class="form">
+    <div class="row sel"><label for="fRun">Run</label><select id="fRun">
         <option value="AM">AM</option>
         <option value="PM">PM</option>
         <option value="Midday">Midday</option>
         <option value="Field trip">Field trip</option>
         <option value="Sports">Sports</option>
         <option value="">None</option>
-      </select>
-    </div>
+      </select></div>
+    <div class="row"><label for="fStart">Start</label><input type="time" id="fStart"></div>
+    <div class="row"><label for="fEnd">End</label><input type="time" id="fEnd"></div>
+    <div class="row"><label for="fBus">Bus</label><input type="text" id="fBus" inputmode="numeric" placeholder="217"></div>
+    <div class="row"><label for="fColor">Color</label><input type="text" id="fColor" list="colorList" placeholder="Yellow" autocomplete="off"><span id="swatch" aria-hidden="true"></span></div>
   </div>
-  <div class="field">
-    <label for="fColor">Bus color</label>
-    <div class="colorwrap">
-      <div id="swatch" aria-hidden="true"></div>
-      <input type="text" id="fColor" list="colorList" placeholder="Yellow" autocomplete="off">
-      <datalist id="colorList">
-        <option>Yellow</option><option>White</option><option>Blue</option>
-        <option>Black</option><option>Silver</option><option>Green</option>
-        <option>Red</option><option>Orange</option><option>Tan</option>
-      </datalist>
-    </div>
+  <div class="form">
+    <div class="row"><label for="fPay"><span class="sub-only">Fee</span><span class="mgr-only">Pay to driver</span></label><input type="number" id="fPay" inputmode="decimal" step="0.01" min="0" placeholder="$0.00"></div>
+    <label class="row toggle" for="fDriverPaid"><span><span class="sub-only">I've been paid</span><span class="mgr-only">Driver paid</span></span><input type="checkbox" id="fDriverPaid" role="switch"></label>
+    <div class="row mgr-only"><label for="fRate">Bill to school</label><input type="number" id="fRate" inputmode="decimal" step="0.01" min="0" placeholder="$0.00"></div>
+    <label class="row toggle mgr-only" for="fSchoolPaid"><span>School paid</span><input type="checkbox" id="fSchoolPaid" role="switch"></label>
   </div>
-  <div class="three">
-    <div class="field">
-      <label for="fStart">Start</label>
-      <input type="time" id="fStart">
-    </div>
-    <div class="field">
-      <label for="fEnd">End</label>
-      <input type="time" id="fEnd">
-    </div>
-    <div class="field">
-      <label for="fFee">Fee</label>
-      <input type="number" id="fFee" inputmode="decimal" step="0.01" min="0" placeholder="88.00">
-    </div>
+  <div class="form">
+    <div class="row"><label for="fNote">Note</label><input type="text" id="fNote" placeholder="Prints on the PDF"></div>
   </div>
-  <div class="field">
-    <label for="fNote">Note for the school (optional)</label>
-    <input type="text" id="fNote" placeholder="Covered route 12 for J. Alvarez">
+  <div class="actions">
+    <button class="btn plain" id="btnSaveNext">Save and log the next one</button>
+    <button class="btn destructive" id="btnDelete" hidden>Delete</button>
   </div>
-  <label class="check" for="fPaid">
-    <input type="checkbox" id="fPaid">
-    <span>I've been paid for this trip</span>
-  </label>
-  <div class="sheet-actions">
-    <button class="save" id="btnSave">Save trip</button>
-    <button class="del" id="btnDelete" hidden>Delete</button>
-    <button class="cancel" id="btnCancelTrip">Cancel</button>
-  </div>
+  <datalist id="schoolList"></datalist>
+  <datalist id="driverList"></datalist>
+  <datalist id="colorList">
+    <option>Yellow</option><option>White</option><option>Blue</option>
+    <option>Black</option><option>Silver</option><option>Green</option>
+    <option>Red</option><option>Orange</option><option>Tan</option>
+  </datalist>
 </section>
 
-<!-- export sheet -->
+<!-- PDFs -->
 <section class="sheet" id="sheetExport" role="dialog" aria-modal="true" aria-labelledby="expTitle">
-  <h3 id="expTitle">Send a school your trips</h3>
-  <div class="field">
-    <label for="xSchool">School</label>
-    <select id="xSchool"></select>
+  <div class="sheethead">
+    <button class="iconbtn" id="btnCancelExport" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <h3 id="expTitle">Send to a school</h3>
+    <span></span>
   </div>
-  <div class="two">
-    <div class="field"><label for="xFrom">From</label><input type="date" id="xFrom"></div>
-    <div class="field"><label for="xTo">To</label><input type="date" id="xTo"></div>
+  <div class="form">
+    <div class="row sel"><label for="xWho" id="xWhoLbl">School</label><select id="xWho"></select></div>
+    <div class="row"><label for="xFrom">From</label><input type="date" id="xFrom"></div>
+    <div class="row"><label for="xTo">To</label><input type="date" id="xTo"></div>
+    <label class="row toggle" for="xUnpaid"><span id="xUnpaidLbl">Only trips I haven't been paid for</span><input type="checkbox" id="xUnpaid" role="switch" checked></label>
   </div>
-  <label class="check" for="xUnpaid">
-    <input type="checkbox" id="xUnpaid" checked>
-    <span>Only trips I haven't been paid for</span>
-  </label>
-  <p class="hint" id="xCount"></p>
-  <div class="sheet-actions">
-    <button class="save" id="btnPrint">Make the PDF</button>
-    <button class="cancel" id="btnXCsv">Spreadsheet</button>
-    <button class="cancel" id="btnCancelExport">Cancel</button>
+  <p class="foot" id="xCount"></p>
+  <div class="actions">
+    <button class="btn tinted" id="btnPrint">Create invoice</button>
+    <button class="btn plain" id="btnXCsv">Download spreadsheet</button>
   </div>
-  <p class="hint">Your print screen opens. Choose <strong>Save as PDF</strong> (or Print to PDF) to get a file you can email. <strong>Spreadsheet</strong> sends the same trips as a CSV instead.</p>
+  <p class="foot">The print screen opens. Choose Save as PDF to get a file you can email.</p>
 </section>
 
-<!-- settings sheet -->
+<!-- settings -->
 <section class="sheet" id="sheetSettings" role="dialog" aria-modal="true" aria-labelledby="setTitle">
-  <h3 id="setTitle">Your details</h3>
-  <p class="hint" style="margin:0 0 14px">These print at the top of every PDF you send out.</p>
-  <div class="field"><label for="dName">Name</label><input type="text" id="dName" placeholder="Yaakov"></div>
-  <div class="two">
-    <div class="field"><label for="dPhone">Phone</label><input type="tel" id="dPhone"></div>
-    <div class="field"><label for="dLicense">CDL / driver ID</label><input type="text" id="dLicense"></div>
+  <div class="sheethead">
+    <button class="iconbtn" id="btnCancelSettings" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <h3 id="setTitle">Settings</h3>
+    <button class="iconbtn tinted" id="btnSaveSettings" aria-label="Save settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
-  <div class="sheet-actions">
-    <button class="save" id="btnSaveSettings">Save</button>
-    <button class="cancel" id="btnCancelSettings">Close</button>
+  <p class="head">I use Route Log to</p>
+  <div class="form" role="radiogroup" aria-label="Role">
+    <button class="row link radio" id="setSub" role="radio" aria-checked="false"><span class="ic" style="background:#FFCC00;color:#1C1C1E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="14.5" rx="3"/><path d="M4.5 10.5h15M8 20.5V18M16 20.5V18"/><circle cx="8.3" cy="14.3" r="1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="14.3" r="1" fill="currentColor" stroke="none"/></svg></span><span class="lbl">Log trips I drive</span><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+    <button class="row link radio" id="setMgr" role="radio" aria-checked="false"><span class="ic" style="background:#3A3A3C;color:#FFD60A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.8-3.2 2.9-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="16.6" cy="8.8" r="2.4"/><path d="M15.6 13.9c2.4-.3 4.3 1.2 5 4.5"/></svg></span><span class="lbl">Manage subs</span><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
   </div>
-  <div class="datarow">
-    <button class="cancel" id="btnBackup">Back up trips</button>
-    <button class="cancel" id="btnRestore">Restore a backup</button>
-    <input type="file" id="fileRestore" accept="application/json,.json" hidden>
+  <p class="foot">Switching keeps everything. Trips you logged as a driver show under Pay drivers with your name.</p>
+
+  <div class="sub-only">
+    <p class="head">You</p>
+    <div class="form">
+      <div class="row"><label for="dName">Name</label><input type="text" id="dName" placeholder="Your name"></div>
+      <div class="row"><label for="dPhone">Phone</label><input type="tel" id="dPhone" placeholder="Optional"></div>
+      <div class="row"><label for="dLicense">CDL / ID</label><input type="text" id="dLicense" placeholder="Optional"></div>
+    </div>
+    <p class="foot">Prints on the records you send schools.</p>
   </div>
-  <div class="datarow">
-    <button class="cancel" id="btnCsvOut">Export spreadsheet</button>
-    <button class="cancel" id="btnCsvIn">Import spreadsheet</button>
-    <input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+
+  <div class="mgr-only">
+    <p class="head">Your business</p>
+    <div class="form">
+      <div class="row"><label for="bName">Name</label><input type="text" id="bName" placeholder="Northside Bus Services"></div>
+      <div class="row"><label for="bAddress">Address</label><input type="text" id="bAddress" placeholder="Optional"></div>
+      <div class="row"><label for="bPhone">Phone</label><input type="tel" id="bPhone" placeholder="Optional"></div>
+      <div class="row"><label for="bEmail">Email</label><input type="email" id="bEmail" placeholder="Optional"></div>
+    </div>
+    <p class="foot">Prints on invoices and pay statements.</p>
   </div>
-  <p class="hint" id="storeWhere"></p>
+
+  <p class="head">Your data</p>
+  <div class="form">
+    <button class="row link" id="btnBackup"><span class="ic" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v10M8 9.5l4 4 4-4M4 14.5v3a2.5 2.5 0 0 0 2.5 2.5h11a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg></span><span class="lbl">Back up</span><i class="chev"></i></button>
+    <button class="row link" id="btnRestore"><span class="ic" style="background:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5v5h5"/><path d="M5.1 14a7.5 7.5 0 1 0 1.6-7.6L4 9.5"/></svg></span><span class="lbl">Restore a backup</span><i class="chev"></i></button>
+    <button class="row link" id="btnCsvOut"><span class="ic" style="background:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15"/></svg></span><span class="lbl">Export spreadsheet</span><i class="chev"></i></button>
+    <button class="row link" id="btnCsvIn"><span class="ic" style="background:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 13.5v-10M8 7.5l4-4 4 4M4 14.5v3a2.5 2.5 0 0 0 2.5 2.5h11a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg></span><span class="lbl">Import spreadsheet</span><i class="chev"></i></button>
+  </div>
+  <input type="file" id="fileRestore" accept="application/json,.json" hidden>
+  <input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+  <p class="foot sub-only">Export spreadsheet gives your manager a file they can import straight into their copy.</p>
+  <p class="foot mgr-only">Import takes a sub's exported spreadsheet as-is. It'll ask whose it is. Restore also accepts Route Desk backups.</p>
+  <p class="foot" id="storeWhere"></p>
 </section>
 
 <div id="report"></div>
@@ -498,444 +802,802 @@
 <script>
 (function(){
   "use strict";
-  var KEY = "routelog:v1";
-  var state = { driver:{name:"",phone:"",license:""}, trips:[], sort:"desc" };
-  var editingId = null;
+  var KEY = "routelog:v2", OLD_LOG = "routelog:v1", OLD_DESK = "routedesk:v1";
+  var state = blank();
+  var editingId = null, touched = {}, auto = {}, pendingImport = null, chosen = "";
+  var DEFAULTS = { fRoute:"", fRun:"AM", fStart:"", fEnd:"", fBus:"", fColor:"Yellow", fRate:"", fPay:"" };
+  var base = { school:"" }, baseFromLast = false;
 
-  /* ---------- storage ----------
-     Three modes, picked at startup:
-       "hosted"  window.storage — present when this runs inside the Claude chat
-       "device"  browser storage — used when the file is opened on its own
-       "memory"  last resort; warns the user, since nothing survives a reload   */
-  var mode = "memory", memValue = null;
+  function blank(){
+    return { v:2, role:"", tab:"drivers", sort:"desc", lastId:"",
+             me:{ name:"", phone:"", license:"" },
+             biz:{ name:"", address:"", phone:"", email:"" },
+             routes:[] };
+  }
+  function $(id){ return document.getElementById(id); }
 
-  function pickMode(){
+  /* ---------- storage: hosted (in Claude), device (browser), or memory ---------- */
+  var store = "memory", memValue = null;
+  function pickStore(){
     if(window.storage && typeof window.storage.get === "function") return "hosted";
     try{
-      var probeKey = "routelog:probe";
-      window.localStorage.setItem(probeKey, "1");
-      window.localStorage.removeItem(probeKey);
+      window.localStorage.setItem("routelog:probe","1");
+      window.localStorage.removeItem("routelog:probe");
       return "device";
     }catch(e){ return "memory"; }
   }
-
-  function warn(on){ $("storageWarn").hidden = !on; }
-
-  async function readRaw(){
-    if(mode === "hosted"){
-      var r = await window.storage.get(KEY);
-      return r && r.value ? r.value : null;
-    }
-    if(mode === "device") return window.localStorage.getItem(KEY);
-    return memValue;
-  }
-  async function writeRaw(str){
-    if(mode === "hosted"){ await window.storage.set(KEY, str); return; }
-    if(mode === "device"){ window.localStorage.setItem(KEY, str); return; }
-    memValue = str;
-  }
-
-  function adopt(parsed){
-    if(parsed && Array.isArray(parsed.trips)){
-      state = {
-        driver: parsed.driver || {name:"",phone:"",license:""},
-        trips: parsed.trips,
-        sort: parsed.sort === "asc" ? "asc" : "desc"
-      };
-      return true;
-    }
-    return false;
-  }
-
-  async function load(){
-    mode = pickMode();
-    warn(mode === "memory");
+  async function readKey(k){
     try{
-      var raw = await readRaw();
-      if(raw) adopt(JSON.parse(raw));
-    }catch(e){ /* first run, or nothing readable yet */ }
+      if(store === "hosted"){ var r = await window.storage.get(k); return r && r.value ? r.value : null; }
+      if(store === "device") return window.localStorage.getItem(k);
+    }catch(e){ return null; }
+    return k === KEY ? memValue : null;
+  }
+  async function writeRaw(s){
+    if(store === "hosted"){ await window.storage.set(KEY, s); return; }
+    if(store === "device"){ window.localStorage.setItem(KEY, s); return; }
+    memValue = s;
+  }
+  function adopt(p){
+    if(!p || !Array.isArray(p.routes)) return false;
+    var b = blank();
+    state = {
+      v:2,
+      role: (p.role === "manager" || p.role === "sub") ? p.role : "",
+      tab: p.tab === "schools" ? "schools" : "drivers",
+      sort: p.sort === "asc" ? "asc" : "desc",
+      lastId: p.lastId || "",
+      me: Object.assign(b.me, p.me || {}),
+      biz: Object.assign(b.biz, p.biz || {}),
+      routes: p.routes
+    };
+    return true;
+  }
+  async function load(){
+    store = pickStore();
+    $("storageWarn").hidden = store !== "memory";
+    var raw = await readKey(KEY);
+    if(raw){ try{ adopt(JSON.parse(raw)); }catch(e){} }
+    if(!state.role){
+      // first run: Route Log and Route Desk on the same site share this browser storage
+      var found = {}, a = await readKey(OLD_LOG), b = await readKey(OLD_DESK);
+      try{ if(a) found.log = convert(JSON.parse(a)); }catch(e){}
+      try{ if(b) found.desk = convert(JSON.parse(b)); }catch(e){}
+      if((found.log && found.log.routes.length) || (found.desk && found.desk.routes.length)) pendingImport = found;
+    }
     describeStore();
   }
-
   async function save(){
-    try{
-      await writeRaw(JSON.stringify(state));
-    }catch(e){
-      // storage filled up or was revoked mid-session — keep working, but say so
-      mode = "memory";
-      memValue = JSON.stringify(state);
-      warn(true);
-      describeStore();
+    try{ await writeRaw(JSON.stringify(state)); }
+    catch(e){
+      store = "memory"; memValue = JSON.stringify(state);
+      $("storageWarn").hidden = false; describeStore();
     }
   }
-
   function describeStore(){
-    var el = $("storeWhere");
-    if(!el) return;
-    el.textContent =
-      mode === "hosted" ? "Saved in your Claude chat. Back up before you open this file anywhere else."
-    : mode === "device" ? "Saved on this device, in this browser. Back up before clearing browsing data."
+    $("storeWhere").textContent =
+      store === "hosted" ? "Saved in your Claude chat. Back up before you open this anywhere else."
+    : store === "device" ? "Saved on this device, in this browser. Back up before clearing browsing data."
     : "Not being saved. Back up now or you'll lose this session.";
+  }
+
+  /* ---------- bringing in Route Log, Route Desk, or our own backups ---------- */
+  function fromLogTrip(t, who){
+    var paid = !!t.paid, on = paid ? (t.paidOn || "") : "", fee = +t.fee || 0;
+    // a sub billed the school directly, so both sides of the trip carry the same fee
+    return { id: t.id || uid(), date: t.date || "", school: t.school || "", driver: who, mine: true,
+             route: t.route || "", run: t.run || "", start: t.start || "", end: t.end || "",
+             bus: t.bus || "", color: t.color || "",
+             pay: fee, rate: fee, driverPaid: paid, driverPaidOn: on, schoolPaid: paid, schoolPaidOn: on,
+             note: t.note || "" };
+  }
+  function convert(p){
+    if(!p) return null;
+    if(Array.isArray(p.trips)){
+      var me = p.driver || null;
+      return { kind:"log", me: me,
+               routes: p.trips.map(function(t){ return fromLogTrip(t, (me && me.name) || "Me"); }) };
+    }
+    if(Array.isArray(p.routes)){
+      return { kind: p.v === 2 ? "combined" : "desk", me: p.me || null, biz: p.biz || null,
+               routes: p.routes.map(function(r){ return Object.assign({}, r); }) };
+    }
+    return null;
+  }
+  function absorb(c){
+    if(!c) return 0;
+    if(c.me && !state.me.name) state.me = Object.assign(state.me, c.me);
+    if(c.biz && !state.biz.name) state.biz = Object.assign(state.biz, c.biz);
+    var byId = {}, added = 0, name = state.me.name;
+    state.routes.forEach(function(r){ byId[r.id] = r; });
+    c.routes.forEach(function(r){
+      if(!r || !r.id) return;
+      var had = byId[r.id];
+      r.mine = !!(r.mine || (had && had.mine) || (name && r.driver === name));
+      if(r.mine && !r.driver) r.driver = meName();
+      if(!had) added++;
+      byId[r.id] = r;
+    });
+    state.routes = Object.keys(byId).map(function(k){ return byId[k]; });
+    return added;
   }
 
   /* ---------- helpers ---------- */
   var money = new Intl.NumberFormat(undefined,{style:"currency",currency:"USD"});
-  function $(id){ return document.getElementById(id); }
-  function uid(){ return "t"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function uid(){ return "r"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
     return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]; }); }
-
-  function d(iso){ // "YYYY-MM-DD" -> local Date, no timezone slip
-    if(!iso) return new Date(NaN);
-    var p = iso.split("-");
-    return new Date(+p[0], +p[1]-1, +p[2]);
-  }
-  function todayISO(){
-    var n = new Date();
-    return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
-  }
+  function d(s){ if(!s) return new Date(NaN); var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function iso(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
+  function todayISO(){ return iso(new Date()); }
   function fmtTime(t){
     if(!t) return "";
-    var p = t.split(":"), h = +p[0], m = p[1];
-    var ap = h < 12 ? "a" : "p";
-    var hh = h % 12; if(hh === 0) hh = 12;
-    return hh + ":" + m + ap;
+    var p = t.split(":"), h = +p[0], ap = h < 12 ? "a" : "p", hh = h % 12 || 12;
+    return hh + ":" + p[1] + ap;
   }
-  function monthKey(iso){ return iso ? iso.slice(0,7) : ""; }
-  function monthName(key){
-    var p = key.split("-");
-    return new Date(+p[0], +p[1]-1, 1).toLocaleDateString(undefined,{month:"long",year:"numeric"});
-  }
-
-  var probe = document.createElement("span");
-  var colorCache = {};
-  function resolveColor(name){
-    var k = (name||"").trim().toLowerCase();
-    if(!k) return [201,198,188];
-    if(colorCache[k]) return colorCache[k];
-    probe.style.color = "";
-    probe.style.color = k;
-    if(!probe.style.color){ colorCache[k] = [201,198,188]; return colorCache[k]; }
-    document.body.appendChild(probe);
-    var rgb = getComputedStyle(probe).color.match(/\d+/g) || [201,198,188];
-    document.body.removeChild(probe);
-    var out = [+rgb[0], +rgb[1], +rgb[2]];
-    colorCache[k] = out;
-    return out;
-  }
-  function readable(rgb){
-    var l = (0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2]);
-    return l > 150 ? "#17191C" : "#FBFAF7";
-  }
-
-  // dir omitted means newest first, which is what the entry form wants
-  // regardless of how the list happens to be ordered on screen
-  function sorted(dir){
-    var up = dir === "asc" ? 1 : -1;
-    return state.trips.slice().sort(function(a,b){
-      if(a.date === b.date) return up * (a.start||"").localeCompare(b.start||"");
-      return up * a.date.localeCompare(b.date);
-    });
-  }
-  function schools(){
+  function timeSpan(r, sep){ var a = fmtTime(r.start), b = fmtTime(r.end); return a && b ? a + (sep || "–") + b : (a || b); }
+  function monthKey(s){ return s ? s.slice(0,7) : ""; }
+  function monthName(k){ var p = k.split("-"); return new Date(+p[0], +p[1]-1, 1).toLocaleDateString(undefined,{month:"long",year:"numeric"}); }
+  function lastDayOf(k){ var p = k.split("-"); return k + "-" + String(new Date(+p[0], +p[1], 0).getDate()).padStart(2,"0"); }
+  function longDate(s){ return d(s).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"}); }
+  function shortDate(s){ return d(s).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+  function val(id){ return $(id).value.trim(); }
+  function num(id){ var v = $(id).value; return v === "" ? 0 : (+v || 0); }
+  function find(id){ return state.routes.find(function(r){ return r.id === id; }); }
+  function meName(){ return state.me.name || "Me"; }
+  function uniqOf(list, field){
     var s = {};
-    state.trips.forEach(function(t){ if(t.school) s[t.school] = 1; });
+    list.forEach(function(r){ var v = String(r[field] == null ? "" : r[field]).trim(); if(v) s[v] = 1; });
     return Object.keys(s).sort(function(a,b){ return a.localeCompare(b); });
   }
+  function latest(pred){
+    var best = null;
+    state.routes.forEach(function(r){
+      if(!pred(r)) return;
+      if(!best || r.date > best.date || (r.date === best.date && (r.start||"") > (best.start||""))) best = r;
+    });
+    return best;
+  }
+  function setSelect(el, v){
+    v = v == null ? "" : String(v);
+    if(v && !Array.prototype.some.call(el.options, function(o){ return o.value === v; })){
+      var o = document.createElement("option"); o.value = v; o.textContent = v; el.appendChild(o);
+    }
+    el.value = v;
+  }
+  var probe = document.createElement("span"), colorCache = {yellow:[255,204,0],white:[255,255,255],blue:[0,122,255],black:[28,28,30],silver:[199,199,204],gray:[142,142,147],grey:[142,142,147],green:[52,199,89],red:[255,59,48],orange:[255,149,0],tan:[210,180,140],brown:[162,132,94],purple:[175,82,222]};
+  function resolveColor(name){
+    var k = (name||"").trim().toLowerCase(), grey = [201,198,188];
+    if(!k) return grey;
+    if(colorCache[k]) return colorCache[k];
+    probe.style.color = ""; probe.style.color = k;
+    if(!probe.style.color) return (colorCache[k] = grey);
+    document.body.appendChild(probe);
+    var m = getComputedStyle(probe).color.match(/\d+/g) || grey;
+    document.body.removeChild(probe);
+    return (colorCache[k] = [+m[0], +m[1], +m[2]]);
+  }
+  function readable(rgb){ return (0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2]) > 150 ? "#17191C" : "#FBFAF7"; }
+
+  /* ---------- the three views ---------- */
+  var V = {
+    mine:    { title:"My trips", noun:["trip","trips"],   all:"All schools", total:"earned",     owed:"owed to you",
+               who:"school", other:"",       amt:"pay",  paid:"driverPaid",
+               box:["Paid. Tap to mark unpaid.", "Not paid yet. Tap when the money comes in."] },
+    drivers: { title:"Route Log", noun:["route","routes"], all:"All drivers", total:"driver pay", owed:"you owe",
+               who:"driver", other:"school", amt:"pay",  paid:"driverPaid",
+               box:["Driver paid. Tap to mark unpaid.", "Driver not paid yet. Tap once you've paid."] },
+    schools: { title:"Route Log", noun:["route","routes"], all:"All schools", total:"billed",     owed:"owed to you",
+               who:"school", other:"driver", amt:"rate", paid:"schoolPaid",
+               box:["School paid. Tap to mark unpaid.", "School hasn't paid. Tap when it does."] }
+  };
+  function isMgr(){ return state.role === "manager"; }
+  function view(){ return isMgr() ? (state.tab === "schools" ? "schools" : "drivers") : "mine"; }
+  function cfg(){ return V[view()]; }
+  function inView(r){ return isMgr() || !!r.mine; }
+  function who(r){ return String(r[cfg().who] || ""); }
+  function other(r){ var o = cfg().other; return o ? String(r[o] || "") : ""; }
+  function amt(r){ return +r[cfg().amt] || 0; }
+  function isPaid(r){ return !!r[cfg().paid]; }
+  function setPaid(r, v){
+    var on = v ? todayISO() : "";
+    if(cfg().paid === "schoolPaid"){ r.schoolPaid = v; r.schoolPaidOn = on; }
+    else { r.driverPaid = v; r.driverPaidOn = on; }
+    if(view() === "mine"){ r.schoolPaid = r.driverPaid; r.schoolPaidOn = r.driverPaidOn; }
+  }
+  function visible(){ return state.routes.filter(inView); }
+  function sorted(dir){
+    var up = dir === "asc" ? 1 : -1;
+    return visible().sort(function(a,b){
+      if(a.date !== b.date) return up * a.date.localeCompare(b.date);
+      var t = (a.start||"").localeCompare(b.start||"");
+      if(t) return up * t;
+      return who(a).localeCompare(who(b));
+    });
+  }
+  function filtered(){
+    var w = $("fWho").value, m = $("fMonth").value;
+    return sorted(state.sort).filter(function(r){ return (!w || who(r) === w) && (!m || monthKey(r.date) === m); });
+  }
+  function optionList(arr){ return arr.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+"</option>"; }).join(""); }
 
   /* ---------- render ---------- */
   function render(){
-    var all = sorted(state.sort);
-    $("sortArrow").textContent = state.sort === "asc" ? "↑" : "↓";
+    var v = view(), c = cfg(), mgr = isMgr();
+    document.body.dataset.role = state.role || "none";
+    $("viewTitle").textContent = c.title;
+    ["Drivers","Schools"].forEach(function(n){
+      var on = v === n.toLowerCase() ? "true" : "false";
+      $("tab" + n).setAttribute("aria-selected", on);
+    });
+    $("setSub").setAttribute("aria-checked", state.role === "sub" ? "true" : "false");
+    $("setMgr").setAttribute("aria-checked", mgr ? "true" : "false");
+    $("btnAddTop").setAttribute("aria-label", mgr ? "Log a route" : "Log a trip");
+
+    $("btnAdd").querySelector("span").textContent = mgr ? "Log a route" : "Log a trip";
+    var pdfWord = v === "drivers" ? "Pay statement" : "Create invoice";
+    $("exportLbl").textContent = pdfWord;
+    $("invoiceLbl").textContent = pdfWord;
+
+    $("btnSort").classList.toggle("asc", state.sort === "asc");
+    $("sortWord").textContent = state.sort === "asc" ? "Oldest" : "Newest";
+    $("btnSort").title = (state.sort === "asc" ? "Oldest" : "Newest") + " first. Tap to flip.";
     $("btnSort").setAttribute("aria-label", state.sort === "asc"
-      ? "Oldest first. Tap to show newest first."
-      : "Newest first. Tap to show oldest first.");
-    $("btnSort").title = state.sort === "asc" ? "Oldest first" : "Newest first";
-    var fs = $("fSchool").value, fm = $("fMonth").value;
-    var list = all.filter(function(t){
-      return (!fs || t.school === fs) && (!fm || monthKey(t.date) === fm);
+      ? "Oldest first. Tap to show newest first." : "Newest first. Tap to show oldest first.");
+
+    var vis = visible();
+    var fw = $("fWho"), keepW = fw.value, people = uniqOf(vis, c.who);
+    fw.innerHTML = '<option value="">' + c.all + "</option>" + optionList(people);
+    fw.value = people.indexOf(keepW) !== -1 ? keepW : "";
+
+    var mk = {}; vis.forEach(function(r){ if(r.date) mk[monthKey(r.date)] = 1; });
+    var months = Object.keys(mk).sort().reverse(), fm = $("fMonth"), keepM = fm.value;
+    fm.innerHTML = '<option value="">All dates</option>'
+      + months.map(function(m){ return '<option value="'+m+'">'+esc(monthName(m))+"</option>"; }).join("");
+    fm.value = months.indexOf(keepM) !== -1 ? keepM : "";
+
+    $("schoolList").innerHTML = uniqOf(state.routes, "school").map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
+    $("driverList").innerHTML = uniqOf(state.routes, "driver").map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
+
+    var list = filtered(), fwv = fw.value;
+    var total = 0, owed = 0, billed = 0, payout = 0;
+    list.forEach(function(r){
+      var a = amt(r); total += a; if(!isPaid(r)) owed += a;
+      billed += +r.rate || 0; payout += +r.pay || 0;
     });
+    $("sTotal").textContent = money.format(total);
+    $("sTotalLbl").textContent = c.total;
+    $("sCount").textContent = list.length;
+    $("sCountLbl").textContent = c.noun[list.length === 1 ? 0 : 1];
+    $("sOwed").textContent = money.format(owed);
+    $("sOwedLbl").textContent = owed > 0 ? c.owed : "all settled";
+    $("sOwed").style.color = owed > 0 ? "var(--bus)" : "";
+    $("sMargin").textContent = money.format(billed - payout);
 
-    // totals — every figure reflects what's currently on screen
-    var shown = 0, owed = 0;
-    list.forEach(function(t){
-      var f = +t.fee || 0;
-      shown += f;
-      if(!t.paid) owed += f;
-    });
-    var narrowed = !!(fs || fm);
-    $("sMonth").textContent = money.format(shown);
-    $("sMonthLbl").textContent = narrowed ? "shown here" : "all time";
-    $("sTrips").textContent = list.length;
-    $("sAll").textContent = money.format(owed);
-    $("sAllLbl").textContent = owed > 0 ? "still owed" : "all settled";
-    $("sAll").style.color = owed > 0 ? "var(--bus)" : "";
+    var unpaid = list.filter(function(r){ return !isPaid(r); }), bulk = $("bulkPay"), canBulk = unpaid.length > 1;
+    var bulkWords = "Mark " + unpaid.length + " " + c.noun[1] + " paid" + (fwv ? (v === "drivers" ? " to " : " by ") + fwv : "");
+    bulk.disabled = !canBulk;
+    bulk.classList.toggle("can", canBulk);
+    bulk.title = canBulk ? bulkWords : "";
+    bulk.setAttribute("aria-label", money.format(owed) + " " + $("sOwedLbl").textContent + (canBulk ? ". " + bulkWords : ""));
 
-    // bulk check-off, only when there's something to check off
-    var unpaidList = list.filter(function(t){ return !t.paid; });
-    var bulk = $("bulkPay");
-    if(unpaidList.length > 1){
-      bulk.hidden = false;
-      bulk.textContent = "Mark these " + unpaidList.length + " trips paid";
-    } else {
-      bulk.hidden = true;
-    }
-
-    // filters
-    var keep = $("fSchool").value;
-    $("fSchool").innerHTML = '<option value="">All schools</option>' +
-      schools().map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+"</option>"; }).join("");
-    $("fSchool").value = keep;
-
-    var mk = {}; all.forEach(function(t){ if(t.date) mk[monthKey(t.date)] = 1; });
-    var months = Object.keys(mk).sort().reverse();
-    var keepM = $("fMonth").value;
-    $("fMonth").innerHTML = '<option value="">All dates</option>' +
-      months.map(function(m){ return '<option value="'+m+'">'+esc(monthName(m))+"</option>"; }).join("");
-    $("fMonth").value = keepM;
-
-    $("schoolList").innerHTML = schools().map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
-
-    // log
-    var log = $("log");
-    var keepScroll = log.scrollTop;
+    var log = $("log"), keep = log.scrollTop;
     if(!list.length){
-      log.innerHTML = '<p class="empty">' + (all.length
-        ? "No trips match those filters."
-        : "Nothing logged yet.<br>Tap <strong>Log a trip</strong> after your next run.") + "</p>";
+      log.innerHTML = '<p class="empty">' + (vis.length
+        ? "Nothing matches those filters."
+        : (mgr ? "Nothing logged yet.<br>Tap <strong>Log a route</strong> when a sub finishes a run."
+               : "Nothing logged yet.<br>Tap <strong>Log a trip</strong> after your next run.")) + "</p>";
       return;
     }
     var html = "", cur = "";
-    list.forEach(function(t){
-      var mkk = monthKey(t.date);
-      if(mkk !== cur){
-        cur = mkk;
-        var inMonth = list.filter(function(x){ return monthKey(x.date) === mkk; });
-        var sub = inMonth.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
-        var due = inMonth.reduce(function(n,x){ return n + (x.paid ? 0 : (+x.fee||0)); }, 0);
-        html += '<div class="month"><h2>' + esc(monthName(mkk)) + "</h2><em>" + money.format(sub)
-          + (due > 0 && due !== sub ? '<i>' + money.format(due) + " out</i>" : "") + "</em></div>";
+    list.forEach(function(r){
+      var k = monthKey(r.date);
+      if(k !== cur){
+        cur = k;
+        var inMonth = list.filter(function(x){ return monthKey(x.date) === k; });
+        var sub = inMonth.reduce(function(n,x){ return n + amt(x); }, 0);
+        var due = inMonth.reduce(function(n,x){ return n + (isPaid(x) ? 0 : amt(x)); }, 0);
+        html += (html ? "</div></section>" : "") + '<section class="group"><div class="month"><h2>' + esc(monthName(k)) + "</h2><em>"
+          + money.format(sub) + (due > 0 && due !== sub ? "<i>" + money.format(due) + " out</i>" : "") + '</em></div><div class="card">';
       }
-      var dt = d(t.date);
-      var rgb = resolveColor(t.color);
-      var meta = [fmtTime(t.start) + (t.end ? "–" + fmtTime(t.end) : ""), t.run].filter(Boolean).join("   ");
-      html += '<div class="trip' + (t.paid ? " is-paid" : "") + '">'
-        + '<button class="tripmain" data-id="'+t.id+'">'
-        + '<span class="date"><span class="dow">'+dt.toLocaleDateString(undefined,{weekday:"short"})+'</span>'
-        + '<span class="dnum">'+dt.getDate()+"</span></span>"
-        + '<span class="plate" style="background:rgb('+rgb.join(",")+');color:'+readable(rgb)+'">'+esc(t.bus||"—")+"</span>"
-        + '<span class="mid"><span class="school">'+esc(t.school||"Unnamed school")+"</span>"
-        + '<span class="meta">'+esc(meta)+"</span></span>"
-        + '<span class="fee">'+money.format(+t.fee||0)+"</span>"
-        + "</button>"
-        + '<button class="paidbox" data-pay="'+t.id+'" aria-pressed="'+(t.paid?"true":"false")+'"'
-        + ' aria-label="' + (t.paid ? "Paid. Tap to mark unpaid." : "Not paid yet. Tap when the money comes in.") + '">'
-        + '<span aria-hidden="true">✓</span></button>'
-        + "</div>";
+      var dt = d(r.date), rgb = resolveColor(r.color), paid = isPaid(r);
+      var bits = [other(r), r.route ? "Rt " + r.route : "", timeSpan(r), r.run]
+        .filter(Boolean).map(function(b){ return "<span>" + esc(b) + "</span>"; }).join("");
+      html += '<div class="trip' + (paid ? " is-paid" : "") + '">'
+        + '<button class="tripmain" data-id="' + esc(r.id) + '">'
+        + '<span class="date"><span class="dow">' + dt.toLocaleDateString(undefined,{weekday:"short"}) + "</span>"
+        + '<span class="dnum">' + dt.getDate() + "</span></span>"
+        + '<span class="plate" style="background:rgb(' + rgb.join(",") + ");color:" + readable(rgb) + '">' + esc(r.bus || "—") + "</span>"
+        + '<span class="mid"><span class="school">' + esc(who(r) || (c.who === "driver" ? "No driver" : "No school")) + "</span>"
+        + '<span class="meta">' + bits + "</span></span>"
+        + '<span class="fee">' + money.format(amt(r)) + "</span></button>"
+        + '<button class="paidbox" data-pay="' + esc(r.id) + '" aria-pressed="' + (paid ? "true" : "false") + '" aria-label="'
+        + c.box[paid ? 0 : 1] + '"><span aria-hidden="true">✓</span></button></div>';
     });
-    log.innerHTML = html;
-    log.scrollTop = keepScroll;
+    log.innerHTML = html + "</div></section>";
+    log.scrollTop = keep;
   }
 
   /* ---------- sheets ---------- */
   function open(el, focusId){
     $("scrim").classList.add("on");
     el.classList.add("on");
-    // Only grab focus for a pointer/keyboard session; on a phone this would
-    // throw the keyboard up over the sheet before he's chosen anything.
-    if(focusId && window.matchMedia("(hover:hover) and (min-width:760px)").matches){
-      setTimeout(function(){ var f = $(focusId); if(f) f.focus(); }, 60);
-    }
+    el.scrollTop = 0;
+    var desk = window.matchMedia && window.matchMedia("(hover:hover) and (min-width:760px)").matches;
+    if(focusId && desk) setTimeout(function(){ var f = $(focusId); if(f) f.focus(); }, 60);
   }
-  function closeAll(){
+  function closeAll(force){
+    if(!force && $("sheetWelcome").classList.contains("on")) return;   // first launch needs an answer
     $("scrim").classList.remove("on");
-    ["sheetTrip","sheetExport","sheetSettings"].forEach(function(i){ $(i).classList.remove("on"); });
+    ["sheetWelcome","sheetTrip","sheetExport","sheetSettings"].forEach(function(i){ $(i).classList.remove("on"); });
   }
-  $("scrim").addEventListener("click", closeAll);
+  $("scrim").addEventListener("click", function(){ closeAll(); });
   document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeAll(); });
 
-  function openTrip(id){
-    editingId = id || null;
-    var t = id ? state.trips.find(function(x){ return x.id === id; }) : null;
-    var last = sorted()[0];
-    $("tripTitle").textContent = t ? "Edit trip" : "Log a trip";
-    $("fDate").value = t ? t.date : todayISO();
-    $("fSchoolIn").value = t ? t.school : (last ? last.school : "");
-    $("fBus").value = t ? t.bus : (last ? last.bus : "");
-    $("fColor").value = t ? t.color : (last ? last.color : "Yellow");
-    $("fRun").value = t ? t.run : "AM";
-    $("fStart").value = t ? t.start : "";
-    $("fEnd").value = t ? t.end : "";
-    $("fFee").value = t ? t.fee : (last ? last.fee : "");
-    $("fNote").value = t ? (t.note || "") : "";
-    $("fPaid").checked = t ? !!t.paid : false;
-    $("btnDelete").hidden = !t;
-    paintSwatch();
-    open($("sheetTrip"), "fSchoolIn");
-  }
-  function paintSwatch(){
-    var rgb = resolveColor($("fColor").value);
-    $("swatch").style.background = "rgb(" + rgb.join(",") + ")";
-  }
-  $("fColor").addEventListener("input", paintSwatch);
-
-  $("btnAdd").addEventListener("click", function(){ openTrip(null); });
-  $("btnAddTop").addEventListener("click", function(){ openTrip(null); });
-
-  // Enter saves from any single-line field in the trip sheet — desktop expects it
-  $("sheetTrip").addEventListener("keydown", function(e){
-    if(e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type !== "checkbox"){
-      e.preventDefault();
-      $("btnSave").click();
+  /* ---------- swipe a sheet down to close it (phones) ---------- */
+  (function(){
+    var drag = null, swallowClickUntil = 0, HANDLE = 64;
+    function phone(){ return !window.matchMedia || window.matchMedia("(max-width:759px)").matches; }
+    function start(e){
+      var el = e.currentTarget;
+      if(!el.classList.contains("on") || !phone() || e.touches.length !== 1) return;
+      var t = e.touches[0], top = el.getBoundingClientRect().top;
+      var onHandle = t.clientY - top < HANDLE;            // grabber + pinned header
+      if(!onHandle && el.scrollTop > 0) return;             // mid-form: let it scroll
+      drag = { el:el, y0:t.clientY, dy:0, live:false, trail:[{ y:t.clientY, t:Date.now() }] };
     }
-  });
-  $("sheetExport").addEventListener("keydown", function(e){
-    if(e.key === "Enter" && !$("btnPrint").disabled){ e.preventDefault(); $("btnPrint").click(); }
-  });
-  $("btnCancelTrip").addEventListener("click", closeAll);
-  $("btnCancelExport").addEventListener("click", closeAll);
-  $("btnCancelSettings").addEventListener("click", closeAll);
+    function move(e){
+      if(!drag) return;
+      var dy = e.touches[0].clientY - drag.y0;
+      if(!drag.live){
+        if(dy < -4){ drag = null; return; }                 // pushing up is a scroll
+        if(dy < 8) return;                                  // too small to be a drag; taps stay taps
+        drag.live = true;
+        drag.h = drag.el.getBoundingClientRect().height;
+        drag.el.style.transition = "none";
+        $("scrim").style.transition = "none";
+        if(document.activeElement && drag.el.contains(document.activeElement)) document.activeElement.blur();
+      }
+      e.preventDefault();
+      drag.trail.push({ y:e.touches[0].clientY, t:Date.now() });
+      if(drag.trail.length > 6) drag.trail.shift();
+      drag.dy = Math.max(0, dy - 8);
+      drag.el.style.transform = "translateY(" + drag.dy + "px)";
+      $("scrim").style.opacity = String(Math.max(0, 1 - drag.dy / drag.h));
+    }
+    function end(){
+      if(!drag) return;
+      var d = drag; drag = null;
+      if(!d.live) return;
+      swallowClickUntil = Date.now() + 350;                 // the finger lifting must not press ✓
+      // speed of the last moment before release, not the whole gesture, so a pause then a flick still counts
+      var last = d.trail[d.trail.length - 1], from = d.trail[0];
+      for(var i = d.trail.length - 2; i >= 0; i--){ from = d.trail[i]; if(last.t - from.t >= 60) break; }
+      var speed = (last.y - from.y) / Math.max(1, last.t - from.t);   // px per ms
+      d.el.style.transition = ""; $("scrim").style.transition = "";
+      d.el.style.transform = "";  $("scrim").style.opacity = "";
+      if(d.dy > d.h / 3 || (speed > 0.5 && d.dy > 40)) closeAll();   // otherwise it springs back
+    }
+    ["sheetTrip","sheetExport","sheetSettings"].forEach(function(id){
+      var el = $(id);
+      el.addEventListener("touchstart", start, { passive:true });
+      el.addEventListener("touchmove", move, { passive:false });
+      el.addEventListener("touchend", end);
+      el.addEventListener("touchcancel", end);
+    });
+    document.addEventListener("click", function(e){
+      if(Date.now() < swallowClickUntil){ e.stopPropagation(); e.preventDefault(); }
+    }, true);
+  })();
 
+  /* ---------- first launch ---------- */
+  function openWelcome(){
+    var f = pendingImport || {}, notes = [];
+    var nLog = f.log ? f.log.routes.length : 0, nDesk = f.desk ? f.desk.routes.length : 0;
+    if(nLog) notes.push(nLog + (nLog === 1 ? " trip" : " trips") + " from Route Log");
+    if(nDesk) notes.push(nDesk + (nDesk === 1 ? " route" : " routes") + " from Route Desk");
+    $("welcomeFound").hidden = !notes.length;
+    $("welcomeFound").textContent = notes.length ? "Found on this device: " + notes.join(" and ") + ". They'll come with you." : "";
+    chooseRole(nDesk && !nLog ? "manager" : (nLog && !nDesk ? "sub" : ""));
+    open($("sheetWelcome"));
+  }
+  function chooseRole(r){
+    chosen = r;
+    $("roleSub").setAttribute("aria-checked", r === "sub" ? "true" : "false");
+    $("roleMgr").setAttribute("aria-checked", r === "manager" ? "true" : "false");
+    $("btnWelcome").disabled = !r;
+  }
+  $("roleSub").addEventListener("click", function(){ chooseRole("sub"); });
+  $("roleMgr").addEventListener("click", function(){ chooseRole("manager"); });
+  $("btnWelcome").addEventListener("click", async function(){
+    if(!chosen) return;
+    state.role = chosen;
+    state.tab = "drivers";
+    if(pendingImport){
+      if(pendingImport.log) absorb(pendingImport.log);
+      if(pendingImport.desk) absorb(pendingImport.desk);
+      if(pendingImport.desk && pendingImport.log) state.sort = "desc";
+      pendingImport = null;
+    }
+    closeAll(true); render(); await save();
+  });
+
+  /* ---------- role switching ---------- */
+  async function setRole(r){
+    if(state.role === r) return;
+    var mine = state.routes.filter(function(x){ return x.mine; }).length;
+    var others = state.routes.length - mine;
+    var msg = r === "manager"
+      ? "Switch to managing subs?" + (mine ? " Your " + mine + (mine === 1 ? " trip stays and shows" : " trips stay and show") + " under Pay drivers as " + meName() + "." : "")
+      : "Switch to logging your own trips?" + (others ? " The " + others + " routes other subs drove are kept, just hidden until you switch back." : "");
+    if(!confirm(msg)) return;
+    state.role = r;
+    state.tab = "drivers";
+    $("fWho").value = "";
+    render(); $("log").scrollTop = 0;
+    await save();
+  }
+  $("setSub").addEventListener("click", function(){ setRole("sub"); });
+  $("setMgr").addEventListener("click", function(){ setRole("manager"); });
+
+  function setTab(t){
+    if(!isMgr() || state.tab === t) return;
+    state.tab = t;
+    $("fWho").value = "";
+    render(); $("log").scrollTop = 0;
+    save();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-go]"), function(b){
+    b.addEventListener("click", function(){ setTab(b.dataset.go); });
+  });
+
+  /* ---------- log / edit ---------- */
+  function paintSwatch(){ $("swatch").style.background = "rgb(" + resolveColor($("fColor").value).join(",") + ")"; }
+  $("fColor").addEventListener("input", paintSwatch);
+  function fieldVal(r, k){ return r && r[k] != null ? r[k] : ""; }
+
+  // What a new form starts from. A sub gets their last logged trip; a manager starts clean.
+  function baseFor(){
+    var b = Object.assign({ school:"" }, DEFAULTS);
+    baseFromLast = false;
+    if(isMgr()) return b;
+    var last = state.lastId ? find(state.lastId) : null;
+    if(!last || !last.mine) last = latest(function(r){ return r.mine; });
+    if(!last) return b;
+    baseFromLast = true;
+    b.school = last.school || ""; b.fRoute = last.route || "";
+    b.fRun = last.run || ""; b.fStart = last.start || ""; b.fEnd = last.end || "";
+    b.fBus = last.bus || ""; b.fColor = last.color || "";
+    b.fPay = last.pay != null ? last.pay : ""; b.fRate = last.rate != null ? last.rate : "";
+    return b;
+  }
+  var HINTS = {
+    route: "Filled in from the last time this route ran. Change anything that's different today.",
+    school: "Filled in from your last trip to this school. Change anything that's different today.",
+    rate: "School rate filled in from the last route at this school.",
+    last: "Filled in from your last trip. Change anything that's different today."
+  };
+  function showHint(k){ $("autoHint").hidden = !k; $("autoHint").textContent = k ? HINTS[k] : ""; }
+
+  function openRoute(id, carry){
+    editingId = id || null; touched = {}; auto = {};
+    var r = id ? find(id) : null, noun = isMgr() ? "route" : "trip";
+    base = r ? Object.assign({ school:"" }, DEFAULTS) : baseFor();
+    function pick(k, f){ return r ? fieldVal(r, k) : base[f]; }
+    $("tripTitle").textContent = (r ? "Edit " : "Log a ") + noun;
+    $("fDate").value = r ? r.date : ((carry && carry.date) || todayISO());
+    $("fSchoolIn").value = r ? fieldVal(r,"school") : ((carry && carry.school) || base.school);
+    $("fDriverIn").value = r ? fieldVal(r,"driver") : (isMgr() ? "" : meName());
+    $("fRoute").value = pick("route", "fRoute");
+    setSelect($("fRun"), r ? r.run : base.fRun);
+    $("fStart").value = pick("start", "fStart");
+    $("fEnd").value = pick("end", "fEnd");
+    $("fBus").value = pick("bus", "fBus");
+    $("fColor").value = pick("color", "fColor");
+    $("fPay").value = pick("pay", "fPay");
+    $("fRate").value = pick("rate", "fRate");
+    $("fDriverPaid").checked = !!(r && r.driverPaid);
+    $("fSchoolPaid").checked = !!(r && r.schoolPaid);
+    $("fNote").value = fieldVal(r,"note");
+    $("btnDelete").textContent = "Delete " + noun;
+    $("btnDelete").hidden = !r;
+    $("btnSaveNext").hidden = !!r;
+    showHint("");
+    $("fSchoolIn").classList.remove("err");
+    if(!r){
+      if(baseFromLast && $("fSchoolIn").value === base.school) showHint("last");
+      else autofill();
+    }
+    paintSwatch();
+    open($("sheetTrip"), r ? null : (carry && carry.school ? "fRoute" : "fSchoolIn"));
+  }
+
+  // Fields the user typed into are never overwritten; fields we filled are refilled each pass.
+  function put(id, v){
+    if(touched[id] || v == null || v === "") return;
+    if(id === "fRun") setSelect($(id), v); else $(id).value = v;
+    auto[id] = true;
+  }
+  function autofill(){
+    if(editingId) return;
+    var mgr = isMgr();
+    Object.keys(auto).forEach(function(id){
+      if(touched[id]) return;
+      if(id === "fRun") setSelect($(id), base[id]); else $(id).value = base[id];
+    });
+    auto = {};
+    var school = val("fSchoolIn"), route = touched.fRoute ? val("fRoute") : "", driver = val("fDriverIn"), src = "";
+    function sameRoute(r){ return r.school === school && String(r.route || "") === route; }
+
+    var onRoute = school && route ? latest(sameRoute) : null;
+    if(onRoute) src = "route";
+    if(!onRoute && !mgr && school){
+      // a sub's run for a school is usually the same each time, route number or not
+      onRoute = latest(function(r){ return r.mine && r.school === school; });
+      if(onRoute) src = "school";
+    }
+    if(onRoute){
+      put("fRun", onRoute.run); put("fStart", onRoute.start); put("fEnd", onRoute.end);
+      put("fBus", onRoute.bus); put("fColor", onRoute.color); put("fRate", onRoute.rate);
+    } else if(school){
+      var atSchool = latest(function(r){ return r.school === school; });
+      if(atSchool){ put("fRate", atSchool.rate); src = "rate"; }
+    }
+    // the route number belongs to a school, so it follows the school unless you typed one
+    if(!touched.fRoute){
+      $("fRoute").value = src === "school" ? (onRoute.route || "") : (school === base.school ? base.fRoute : "");
+    }
+
+    var mine = driver ? (latest(function(r){ return r.driver === driver && sameRoute(r); })
+                      || (school ? latest(function(r){ return r.driver === driver && r.school === school; }) : null)
+                      || (mgr ? latest(function(r){ return r.driver === driver; }) : null)) : null;
+    if(mine) put("fPay", mine.pay);
+    else if(onRoute) put("fPay", onRoute.pay);
+
+    if(!src && baseFromLast) src = "last";
+    if(src === "rate" && !mgr) src = baseFromLast ? "last" : "";
+    showHint(src);
+    paintSwatch();
+  }
+  ["fRoute","fRun","fStart","fEnd","fBus","fColor","fRate","fPay"].forEach(function(id){
+    ["input","change"].forEach(function(ev){ $(id).addEventListener(ev, function(){ touched[id] = true; }); });
+  });
+  ["fSchoolIn","fRoute","fDriverIn"].forEach(function(id){
+    $(id).addEventListener("input", autofill);
+    $(id).addEventListener("change", autofill);
+  });
+  $("fSchoolIn").addEventListener("input", function(){ this.classList.remove("err"); });
+  $("fDriverIn").addEventListener("input", function(){ $("fSchoolIn").classList.remove("err"); });
+
+  async function commit(next){
+    var mgr = isMgr(), school = val("fSchoolIn"), driver = mgr ? val("fDriverIn") : meName();
+    if(mgr ? (!school && !driver) : !school){
+      $("fSchoolIn").classList.add("err"); $("fSchoolIn").focus(); return;
+    }
+    var prev = editingId ? find(editingId) : null;
+    var dp = $("fDriverPaid").checked, sp = $("fSchoolPaid").checked;
+    var rec = {
+      id: prev ? prev.id : uid(),
+      date: $("fDate").value || todayISO(),
+      school: school, driver: driver,
+      mine: mgr ? !!((prev && prev.mine && driver === prev.driver) || (state.me.name && driver === state.me.name)) : true,
+      route: val("fRoute"), run: $("fRun").value,
+      start: $("fStart").value, end: $("fEnd").value,
+      bus: val("fBus"), color: val("fColor"),
+      pay: num("fPay"), rate: num("fRate"),
+      driverPaid: dp, driverPaidOn: dp ? ((prev && prev.driverPaidOn) || todayISO()) : "",
+      schoolPaid: sp, schoolPaidOn: sp ? ((prev && prev.schoolPaidOn) || todayISO()) : "",
+      note: val("fNote")
+    };
+    if(!mgr){
+      // a sub bills the school directly: the fee is what the school owes, and paid means paid
+      rec.rate = rec.pay; rec.schoolPaid = rec.driverPaid; rec.schoolPaidOn = rec.driverPaidOn;
+    }
+    if(prev) state.routes[state.routes.indexOf(prev)] = rec;
+    else { state.routes.push(rec); state.lastId = rec.id; }
+    render(); await save();
+    if(next){
+      openRoute(null, { date: rec.date, school: rec.school });
+      $("tripTitle").innerHTML = esc($("tripTitle").textContent) + '<span class="saved">Saved ' + esc(rec.route ? "route " + rec.route : "the last one") + "</span>";
+    } else closeAll();
+  }
+
+  function addNew(){ openRoute(null); }
+  $("btnAdd").addEventListener("click", addNew);
+  $("btnAddTop").addEventListener("click", addNew);
+  $("btnSave").addEventListener("click", function(){ commit(false); });
+  $("btnSaveNext").addEventListener("click", function(){ commit(true); });
+  $("btnCancelTrip").addEventListener("click", function(){ closeAll(); });
+  $("btnDelete").addEventListener("click", async function(){
+    if(!editingId || !confirm("Delete this " + (isMgr() ? "route" : "trip") + "? This can't be undone.")) return;
+    state.routes = state.routes.filter(function(r){ return r.id !== editingId; });
+    closeAll(); render(); await save();
+  });
+  $("sheetTrip").addEventListener("keydown", function(e){
+    if(e.key !== "Enter" || e.target.tagName !== "INPUT" || e.target.type === "checkbox") return;
+    e.preventDefault(); commit(e.shiftKey && !editingId);
+  });
+
+  /* ---------- list ---------- */
   $("log").addEventListener("click", async function(e){
     var box = e.target.closest(".paidbox");
     if(box){
-      var t = state.trips.find(function(x){ return x.id === box.dataset.pay; });
-      if(!t) return;
-      t.paid = !t.paid;
-      t.paidOn = t.paid ? todayISO() : "";
-      render(); await save();
-      return;
+      var r = find(box.dataset.pay);
+      if(!r) return;
+      setPaid(r, !isPaid(r)); render(); await save(); return;
     }
-    var b = e.target.closest(".tripmain");
-    if(b) openTrip(b.dataset.id);
+    var row = e.target.closest(".tripmain");
+    if(row) openRoute(row.dataset.id);
   });
-
   $("bulkPay").addEventListener("click", async function(){
-    var fs = $("fSchool").value, fm = $("fMonth").value;
-    var hit = state.trips.filter(function(t){
-      return !t.paid && (!fs || t.school === fs) && (!fm || monthKey(t.date) === fm);
-    });
+    var hit = filtered().filter(function(r){ return !isPaid(r); });
     if(!hit.length) return;
-    var sum = hit.reduce(function(n,t){ return n + (+t.fee||0); }, 0);
-    if(!confirm("Mark " + hit.length + " trips paid? That's " + money.format(sum) + ".")) return;
-    hit.forEach(function(t){ t.paid = true; t.paidOn = todayISO(); });
+    var sum = hit.reduce(function(n,r){ return n + amt(r); }, 0), whom = $("fWho").value, v = view();
+    var q = "Mark " + hit.length + " " + cfg().noun[1] + " paid"
+      + (whom ? (v === "drivers" ? " to " : " by ") + whom : "") + "? That's " + money.format(sum)
+      + (v === "drivers" ? " paid out." : " received.");
+    if(!confirm(q)) return;
+    hit.forEach(function(r){ setPaid(r, true); });
     render(); await save();
   });
-
-  $("btnSave").addEventListener("click", async function(){
-    var rec = {
-      id: editingId || uid(),
-      date: $("fDate").value || todayISO(),
-      school: $("fSchoolIn").value.trim(),
-      bus: $("fBus").value.trim(),
-      color: $("fColor").value.trim(),
-      run: $("fRun").value,
-      start: $("fStart").value,
-      end: $("fEnd").value,
-      fee: $("fFee").value === "" ? 0 : +$("fFee").value,
-      note: $("fNote").value.trim(),
-      paid: $("fPaid").checked,
-      paidOn: $("fPaid").checked
-        ? ((editingId && (state.trips.find(function(x){ return x.id === editingId; }) || {}).paidOn) || todayISO())
-        : ""
-    };
-    if(editingId){
-      var i = state.trips.findIndex(function(x){ return x.id === editingId; });
-      state.trips[i] = rec;
-    } else {
-      state.trips.push(rec);
-    }
-    closeAll(); render(); await save();
-  });
-
-  $("btnDelete").addEventListener("click", async function(){
-    if(!editingId) return;
-    state.trips = state.trips.filter(function(x){ return x.id !== editingId; });
-    closeAll(); render(); await save();
-  });
-
   $("btnSort").addEventListener("click", async function(){
     state.sort = state.sort === "asc" ? "desc" : "asc";
-    render();
-    $("log").scrollTo({ top:0, behavior:"smooth" });
-    await save();
+    render(); $("log").scrollTop = 0; await save();
   });
-
   function refilter(){ render(); $("log").scrollTop = 0; }
-  $("fSchool").addEventListener("change", refilter);
+  $("fWho").addEventListener("change", refilter);
   $("fMonth").addEventListener("change", refilter);
 
-  /* ---------- settings ---------- */
-  $("btnSettings").addEventListener("click", function(){
-    $("dName").value = state.driver.name || "";
-    $("dPhone").value = state.driver.phone || "";
-    $("dLicense").value = state.driver.license || "";
-    open($("sheetSettings"), "dName");
-  });
-  $("btnSaveSettings").addEventListener("click", async function(){
-    state.driver = { name:$("dName").value.trim(), phone:$("dPhone").value.trim(), license:$("dLicense").value.trim() };
-    closeAll(); await save();
-  });
-  $("btnRestore").addEventListener("click", function(){ $("fileRestore").click(); });
-  $("fileRestore").addEventListener("change", async function(e){
-    var f = e.target.files && e.target.files[0];
-    if(!f) return;
-    var text = await f.text();
-    var parsed;
-    try{ parsed = JSON.parse(text); }
-    catch(err){ alert("That file isn't a Route Log backup."); e.target.value = ""; return; }
-    if(!parsed || !Array.isArray(parsed.trips)){
-      alert("That file isn't a Route Log backup.");
-      e.target.value = ""; return;
-    }
-    var byId = {};
-    state.trips.forEach(function(t){ byId[t.id] = t; });
-    var added = 0;
-    parsed.trips.forEach(function(t){
-      if(!t || !t.id) return;
-      if(!byId[t.id]) added++;
-      byId[t.id] = t;
-    });
-    state.trips = Object.keys(byId).map(function(k){ return byId[k]; });
-    if(parsed.driver && !state.driver.name) state.driver = parsed.driver;
-    e.target.value = "";
-    render(); await save();
-    alert(added + (added === 1 ? " trip added." : " trips added.") + " Nothing was overwritten except matching entries.");
-  });
-
-  /* ---------- spreadsheet in and out ---------- */
-  var CSV_COLS = ["Date","School","Bus","Color","Run","Start","End","Fee","Paid","Paid On","Note","ID"];
-
-  function csvCell(v){
-    var s = v == null ? "" : String(v);
-    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  /* ---------- PDFs: a sub's record, a driver's pay statement, a school's invoice ---------- */
+  function exportRows(){
+    var w = $("xWho").value, f = $("xFrom").value, t = $("xTo").value, unpaidOnly = $("xUnpaid").checked;
+    return visible().filter(function(r){
+      if(w && who(r) !== w) return false;
+      if(f && r.date < f) return false;
+      if(t && r.date > t) return false;
+      if(unpaidOnly && isPaid(r)) return false;
+      return true;
+    }).sort(function(a,b){ return a.date.localeCompare(b.date) || (a.start||"").localeCompare(b.start||""); });
   }
-  function toCSV(rows){
-    var out = [CSV_COLS.join(",")];
-    rows.forEach(function(t){
-      out.push([
-        t.date, t.school, t.bus, t.color, t.run,
-        fmtTime(t.start), fmtTime(t.end),
-        (+t.fee || 0).toFixed(2),
-        t.paid ? "Yes" : "No",
-        t.paidOn || "", t.note || "", t.id
-      ].map(csvCell).join(","));
+  function updateCount(){
+    var rows = exportRows(), c = cfg(), sum = rows.reduce(function(n,r){ return n + amt(r); }, 0);
+    $("xCount").textContent = rows.length
+      ? rows.length + " " + c.noun[rows.length === 1 ? 0 : 1] + ", " + money.format(sum) + " total."
+      : ($("xUnpaid").checked
+          ? (view() === "drivers" ? "This driver is paid up for those dates." : "This school is paid up for those dates.")
+            + " Untick the switch to send the full record."
+          : "Nothing matches. Widen the dates or pick someone else.");
+    $("btnPrint").disabled = !rows.length;
+    $("btnXCsv").disabled = !rows.length;
+  }
+  function openExport(){
+    var v = view(), people = uniqOf(visible(), cfg().who);
+    if(!people.length){ alert(v === "drivers" ? "No drivers logged yet." : "No schools logged yet."); return; }
+    $("expTitle").textContent = v === "drivers" ? "Driver pay statement" : "Create invoice";
+    $("btnPrint").textContent = v === "drivers" ? "Create statement" : "Create invoice";
+    $("xWhoLbl").textContent = v === "drivers" ? "Driver" : "School";
+    $("xUnpaidLbl").textContent = v === "mine" ? "Only trips I haven't been paid for"
+      : (v === "drivers" ? "Only routes I haven't paid this driver for" : "Only routes this school hasn't paid for");
+    $("xWho").innerHTML = optionList(people);
+    if($("fWho").value) $("xWho").value = $("fWho").value;
+    var fm = $("fMonth").value;
+    $("xFrom").value = fm ? fm + "-01" : "";
+    $("xTo").value = fm ? lastDayOf(fm) : "";
+    updateCount();
+    open($("sheetExport"), "xWho");
+  }
+  $("btnExport").addEventListener("click", openExport);
+  $("btnInvoice").addEventListener("click", openExport);
+  ["xWho","xFrom","xTo","xUnpaid"].forEach(function(i){ $(i).addEventListener("change", updateCount); });
+  $("btnCancelExport").addEventListener("click", function(){ closeAll(); });
+  $("sheetExport").addEventListener("keydown", function(e){
+    if(e.key === "Enter" && !$("btnPrint").disabled){ e.preventDefault(); $("btnPrint").click(); }
+  });
+
+  function invoiceNo(name){
+    var initials = (name.match(/\b[A-Za-z0-9]/g) || ["X"]).join("").toUpperCase().slice(0,4);
+    return "INV-" + todayISO().replace(/-/g,"") + "-" + initials;
+  }
+  function footer(sum, settled, cols, words){
+    var h = "<tfoot>";
+    if(settled > 0 && settled < sum){
+      h += '<tr><td colspan="' + cols + '">' + words[0] + '</td><td class="n">' + money.format(sum) + "</td></tr>"
+        + '<tr class="q"><td colspan="' + cols + '">Already paid</td><td class="n">&minus;' + money.format(settled) + "</td></tr>"
+        + '<tr><td colspan="' + cols + '">' + words[1] + '</td><td class="n">' + money.format(sum - settled) + "</td></tr>";
+    } else if(sum > 0 && settled >= sum){
+      h += '<tr><td colspan="' + cols + '">Total, paid in full</td><td class="n">' + money.format(sum) + "</td></tr>";
+    } else {
+      h += '<tr><td colspan="' + cols + '">' + words[2] + '</td><td class="n">' + money.format(sum) + "</td></tr>";
+    }
+    return h + "</tfoot>";
+  }
+  function table(rows, cols, cells, lastHead){
+    var h = "<table><thead><tr>" + cols.map(function(c){ return "<th>" + c + "</th>"; }).join("")
+      + "<th class='n'>" + lastHead + "</th></tr></thead><tbody>";
+    rows.forEach(function(r){
+      h += "<tr>" + cells(r).map(function(c){ return "<td>" + esc(c || "") + "</td>"; }).join("")
+        + "<td class='n'>" + money.format(amt(r)) + "</td></tr>";
+      if(r.note) h += '<tr><td colspan="' + (cols.length + 1) + '" class="note">' + esc(r.note) + "</td></tr>";
     });
-    // BOM so Excel opens it as UTF-8 rather than mangling anything
+    return h + "</tbody>";
+  }
+  function buildReport(rows){
+    var v = view(), name = $("xWho").value, b = state.biz, m = state.me;
+    var sum = 0, settled = 0;
+    rows.forEach(function(r){ var a = amt(r); sum += a; if(isPaid(r)) settled += a; });
+    var span = longDate(rows[0].date) + " – " + longDate(rows[rows.length-1].date);
+    function status(r){
+      var on = v === "schools" ? r.schoolPaidOn : r.driverPaidOn;
+      return isPaid(r) ? "Paid" + (on ? " " + shortDate(on) : "") : "Outstanding";
+    }
+    function day(r){ return d(r.date).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
+
+    if(v === "mine"){
+      var cols = ["Date","Route","Run","Bus","Color","Time","Status"];
+      return '<div class="rpt-head"><div class="rpt-top"><div><h1>Invoice</h1>'
+        + '<div class="who"><strong>' + esc(m.name || "Substitute driver") + "</strong>"
+        + (m.license ? "<br>Driver ID " + esc(m.license) : "") + (m.phone ? "<br>" + esc(m.phone) : "") + "</div></div>"
+        + '<div class="rpt-meta">Invoice no. ' + esc(invoiceNo(name)) + "<br>Issued " + esc(longDate(todayISO())) + "<br>" + esc(span) + "</div></div>"
+        + '<div class="billto"><span>Bill to</span><strong>' + esc(name) + "</strong></div>"
+        + '<div class="period">' + rows.length + (rows.length === 1 ? " trip" : " trips") + "</div></div>"
+        + table(rows, cols, function(r){ return [day(r), r.route, r.run, r.bus, r.color, timeSpan(r," – "), status(r)]; }, "Fee")
+        + footer(sum, settled, cols.length, ["Trips billed", "Balance due", "Total due"]) + "</table>"
+        + '<div class="sign"><div>Driver signature</div><div>School authorization</div><div>Date</div></div>';
+    }
+
+    var sch = v === "schools";
+    var contact = [b.phone, b.email].filter(Boolean).map(esc).join(" &nbsp;|&nbsp; ");
+    var from = '<div class="who"><strong>' + esc(b.name || "Bus services") + "</strong>"
+      + (b.address ? "<br>" + esc(b.address) : "") + (contact ? "<br>" + contact : "") + "</div>";
+    var meta = (sch ? "Invoice no. " + esc(invoiceNo(name)) + "<br>" : "") + "Issued " + esc(longDate(todayISO())) + "<br>" + esc(span);
+    var cols2 = sch ? ["Date","Route","Run","Driver","Bus","Time","Status"] : ["Date","School","Route","Run","Bus","Time","Status"];
+    return '<div class="rpt-head"><div class="rpt-top"><div><h1>' + (sch ? "Invoice" : "Driver pay statement") + "</h1>" + from
+      + '</div><div class="rpt-meta">' + meta + "</div></div>"
+      + '<div class="billto"><span>' + (sch ? "Bill to" : "Paid to") + "</span><strong>" + esc(name) + "</strong></div>"
+      + '<div class="period">' + rows.length + (rows.length === 1 ? " route" : " routes") + "</div></div>"
+      + table(rows, cols2, function(r){
+          return sch ? [day(r), r.route, r.run, r.driver, r.bus, timeSpan(r," – "), status(r)]
+                     : [day(r), r.school, r.route, r.run, r.bus, timeSpan(r," – "), status(r)];
+        }, sch ? "Amount" : "Pay")
+      + footer(sum, settled, cols2.length, sch ? ["Routes billed", "Balance due", "Total due"]
+                                             : ["Earned", "Balance owed to driver", "Total owed to driver"]) + "</table>"
+      + '<div class="sign">' + (sch ? "<div>Approved by</div><div>Title</div><div>Date</div>"
+                                    : "<div>Driver signature</div><div>Manager</div><div>Date</div>") + "</div>";
+  }
+  $("btnPrint").addEventListener("click", function(){
+    var rows = exportRows();
+    if(!rows.length) return;
+    $("report").innerHTML = buildReport(rows);
+    closeAll();
+    setTimeout(function(){ window.print(); }, 220);
+  });
+
+  /* ---------- spreadsheets ---------- */
+  // A sub's sheet keeps Route Log's columns so any manager's copy imports it as-is.
+  var COLS_SUB = ["Date","School","Route","Bus","Color","Run","Start","End","Fee","Paid","Paid On","Note","ID"];
+  var COLS_MGR = ["Date","School","Driver","Route","Run","Start","End","Bus","Color",
+                  "Driver Pay","Driver Paid","Driver Paid On","School Rate","School Paid","School Paid On","Note","ID"];
+  function csvCell(v){ var s = v == null ? "" : String(v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+  function toCSV(rows, asSub){
+    var out = [(asSub ? COLS_SUB : COLS_MGR).join(",")];
+    rows.forEach(function(r){
+      var cells = asSub
+        ? [r.date, r.school, r.route, r.bus, r.color, r.run, fmtTime(r.start), fmtTime(r.end),
+           (+r.pay || 0).toFixed(2), r.driverPaid ? "Yes" : "No", r.driverPaidOn || "", r.note || "", r.id]
+        : [r.date, r.school, r.driver, r.route, r.run, fmtTime(r.start), fmtTime(r.end), r.bus, r.color,
+           (+r.pay || 0).toFixed(2), r.driverPaid ? "Yes" : "No", r.driverPaidOn || "",
+           (+r.rate || 0).toFixed(2), r.schoolPaid ? "Yes" : "No", r.schoolPaidOn || "", r.note || "", r.id];
+      out.push(cells.map(csvCell).join(","));
+    });
     return "\uFEFF" + out.join("\r\n") + "\r\n";
   }
-
-  // RFC 4180: quoted fields may hold commas, newlines, and doubled quotes
   function parseCSV(text){
     text = text.replace(/^\uFEFF/, "");
     var rows = [], row = [], cell = "", q = false, i = 0;
     while(i < text.length){
       var c = text[i];
       if(q){
-        if(c === '"'){
-          if(text[i+1] === '"'){ cell += '"'; i += 2; continue; }
-          q = false; i++; continue;
-        }
+        if(c === '"'){ if(text[i+1] === '"'){ cell += '"'; i += 2; continue; } q = false; i++; continue; }
         cell += c; i++; continue;
       }
       if(c === '"'){ q = true; i++; continue; }
@@ -947,267 +1609,174 @@
     if(cell !== "" || row.length){ row.push(cell); rows.push(row); }
     return rows.filter(function(r){ return r.some(function(x){ return String(x).trim() !== ""; }); });
   }
-
-  // Spreadsheets rewrite dates in whatever the machine's locale is.
   function readDate(v){
     var s = String(v || "").trim();
     if(!s) return "";
-    var iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-    if(iso) return iso[1] + "-" + String(+iso[2]).padStart(2,"0") + "-" + String(+iso[3]).padStart(2,"0");
-    var us = s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/);
-    if(us){
-      var y = +us[3]; if(y < 100) y += 2000;
-      return y + "-" + String(+us[1]).padStart(2,"0") + "-" + String(+us[2]).padStart(2,"0");
-    }
+    var a = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(a) return a[1] + "-" + String(+a[2]).padStart(2,"0") + "-" + String(+a[3]).padStart(2,"0");
+    var u = s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/);
+    if(u){ var y = +u[3]; if(y < 100) y += 2000; return y + "-" + String(+u[1]).padStart(2,"0") + "-" + String(+u[2]).padStart(2,"0"); }
     var p = new Date(s);
-    if(!isNaN(p)) return p.getFullYear() + "-" + String(p.getMonth()+1).padStart(2,"0") + "-" + String(p.getDate()).padStart(2,"0");
-    return "";
+    return isNaN(p) ? "" : iso(p);
   }
   function readTime(v){
-    var s = String(v || "").trim().toLowerCase();
-    if(!s) return "";
-    var m = s.match(/^(\d{1,2})[:.](\d{2})\s*([ap])?/);
+    var s = String(v || "").trim().toLowerCase(), m = s.match(/^(\d{1,2})[:.](\d{2})\s*([ap])?/);
     if(!m) return "";
     var h = +m[1];
     if(m[3] === "p" && h < 12) h += 12;
     if(m[3] === "a" && h === 12) h = 0;
     return String(h).padStart(2,"0") + ":" + m[2];
   }
-  function readFee(v){
-    var n = parseFloat(String(v || "").replace(/[^0-9.\-]/g, ""));
-    return isNaN(n) ? 0 : n;
-  }
-  function readPaid(v){
-    return /^(y|yes|true|1|paid|x)$/i.test(String(v || "").trim());
+  function readMoney(v){ var n = parseFloat(String(v || "").replace(/[^0-9.\-]/g,"")); return isNaN(n) ? 0 : n; }
+  function readYes(v){ return /^(y|yes|true|1|paid|x)$/i.test(String(v || "").trim()); }
+  function headOf(text){ return (parseCSV(text)[0] || []).map(function(h){ return String(h).trim().toLowerCase(); }); }
+
+  function importCSV(text, driverFallback){
+    var rows = parseCSV(text);
+    if(rows.length < 2) return { bad:true };
+    var sub = !isMgr(), head = rows[0].map(function(h){ return String(h).trim().toLowerCase(); });
+    function col(){ for(var i = 0; i < arguments.length; i++){ var a = head.indexOf(arguments[i]); if(a !== -1) return a; } return -1; }
+    var ix = {
+      date: col("date"), school: col("school"),
+      driver: col("driver","sub","substitute","sub driver"),
+      route: col("route","route #","route number"), run: col("run","run type"),
+      start: col("start","start time","time"), end: col("end","end time"),
+      bus: col("bus","bus #","bus number"), color: col("color","bus color","colour"),
+      pay: col("driver pay","pay","fee","driver rate"),
+      driverPaid: col("driver paid","paid"), driverPaidOn: col("driver paid on","paid on"),
+      rate: col("school rate","rate","bill","amount"),
+      schoolPaid: col("school paid"), schoolPaidOn: col("school paid on"),
+      note: col("note","notes","comment"), id: col("id")
+    };
+    if(ix.date === -1) return { bad:true };
+    function at(r,k){ return ix[k] === -1 ? "" : String(r[ix[k]] == null ? "" : r[ix[k]]).trim(); }
+
+    var byId = {}, prints = {};
+    function fp(r){ return [r.date, r.school, r.driver, r.route, r.start].join("|"); }
+    state.routes.forEach(function(r){ byId[r.id] = r; prints[fp(r)] = r; });
+
+    var added = 0, updated = 0, skipped = 0;
+    rows.slice(1).forEach(function(row){
+      var date = readDate(at(row,"date"));
+      if(!date){ skipped++; return; }
+      var dp = readYes(at(row,"driverPaid")), sp = readYes(at(row,"schoolPaid"));
+      var driver = sub ? meName() : (at(row,"driver") || driverFallback || "");
+      var rec = {
+        date: date, school: at(row,"school"), driver: driver,
+        mine: sub || !!(state.me.name && driver === state.me.name),
+        route: at(row,"route"), run: at(row,"run"),
+        start: readTime(at(row,"start")), end: readTime(at(row,"end")),
+        bus: at(row,"bus"), color: at(row,"color"),
+        pay: readMoney(at(row,"pay")), rate: readMoney(at(row,"rate")),
+        driverPaid: dp, driverPaidOn: dp ? (readDate(at(row,"driverPaidOn")) || todayISO()) : "",
+        schoolPaid: sp, schoolPaidOn: sp ? (readDate(at(row,"schoolPaidOn")) || todayISO()) : "",
+        note: at(row,"note")
+      };
+      if(sub){ rec.rate = rec.pay; rec.schoolPaid = rec.driverPaid; rec.schoolPaidOn = rec.driverPaidOn; }
+      var id = at(row,"id"), had = id ? byId[id] : null;
+      if(had){
+        rec.id = id;
+        rec.mine = rec.mine || !!had.mine;
+        // a sub's sheet knows nothing about your school billing; keep what you had
+        if(!sub && ix.rate === -1){ rec.rate = had.rate; rec.schoolPaid = had.schoolPaid; rec.schoolPaidOn = had.schoolPaidOn; }
+        state.routes[state.routes.indexOf(had)] = rec;
+        byId[id] = rec; prints[fp(rec)] = rec;
+        updated++; return;
+      }
+      if(prints[fp(rec)]){ skipped++; return; }
+      rec.id = id || uid();
+      state.routes.push(rec);
+      byId[rec.id] = rec; prints[fp(rec)] = rec;
+      added++;
+    });
+    return { bad:false, added:added, updated:updated, skipped:skipped };
   }
 
   function downloadFile(name, text, mime){
     var url = URL.createObjectURL(new Blob([text], { type:mime }));
     var a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    // Some Android webviews ignore a click on a detached anchor
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 2000);
+    a.href = url; a.download = name; a.style.display = "none";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 2000);
   }
+  function slug(s){ return String(s || "routes").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase(); }
 
-  function importCSV(text){
-    var rows = parseCSV(text);
-    if(rows.length < 2) return { added:0, updated:0, skipped:0, bad:true };
-
-    var head = rows[0].map(function(h){ return String(h).trim().toLowerCase(); });
-    function col(){
-      for(var i = 0; i < arguments.length; i++){
-        var at = head.indexOf(arguments[i]);
-        if(at !== -1) return at;
-      }
-      return -1;
-    }
-    var ix = {
-      date:   col("date"),
-      school: col("school"),
-      bus:    col("bus","bus number","bus #"),
-      color:  col("color","bus color","colour"),
-      run:    col("run","route","run type"),
-      start:  col("start","start time","time"),
-      end:    col("end","end time"),
-      fee:    col("fee","amount","pay","rate"),
-      paid:   col("paid","status"),
-      paidOn: col("paid on","paid date"),
-      note:   col("note","notes","comment"),
-      id:     col("id")
-    };
-    if(ix.date === -1) return { added:0, updated:0, skipped:0, bad:true };
-
-    function at(r, k){ return ix[k] === -1 ? "" : String(r[ix[k]] == null ? "" : r[ix[k]]).trim(); }
-
-    var byId = {}, fingerprint = {};
-    state.trips.forEach(function(t){
-      byId[t.id] = t;
-      fingerprint[[t.date,t.school,t.bus,t.start,+t.fee||0].join("|")] = t;
-    });
-
-    var added = 0, updated = 0, skipped = 0;
-    rows.slice(1).forEach(function(r){
-      var date = readDate(at(r,"date"));
-      if(!date){ skipped++; return; }
-
-      var rec = {
-        date: date,
-        school: at(r,"school"),
-        bus: at(r,"bus"),
-        color: at(r,"color"),
-        run: at(r,"run"),
-        start: readTime(at(r,"start")),
-        end: readTime(at(r,"end")),
-        fee: readFee(at(r,"fee")),
-        note: at(r,"note"),
-        paid: readPaid(at(r,"paid")),
-        paidOn: readDate(at(r,"paidOn"))
-      };
-      if(rec.paid && !rec.paidOn) rec.paidOn = todayISO();
-      if(!rec.paid) rec.paidOn = "";
-
-      var id = at(r,"id");
-      if(id && byId[id]){
-        rec.id = id;
-        var pos = state.trips.findIndex(function(x){ return x.id === id; });
-        state.trips[pos] = rec;
-        byId[id] = rec;
-        updated++;
-        return;
-      }
-      // No id, or an id we've never seen: guard against importing twice
-      var fp = [rec.date,rec.school,rec.bus,rec.start,rec.fee].join("|");
-      if(fingerprint[fp]){ skipped++; return; }
-
-      rec.id = id || uid();
-      state.trips.push(rec);
-      byId[rec.id] = rec;
-      fingerprint[fp] = rec;
-      added++;
-    });
-
-    return { added:added, updated:updated, skipped:skipped, bad:false };
-  }
-
-  $("btnCsvOut").addEventListener("click", function(){
-    if(!state.trips.length){ alert("Nothing to export yet."); return; }
-    downloadFile("route-log-" + todayISO() + ".csv", toCSV(sorted("asc")), "text/csv");
+  $("btnXCsv").addEventListener("click", function(){
+    var rows = exportRows();
+    if(rows.length) downloadFile(slug($("xWho").value) + "-" + todayISO() + ".csv", toCSV(rows, !isMgr()), "text/csv");
   });
-
+  $("btnCsvOut").addEventListener("click", function(){
+    var rows = sorted("asc");
+    if(!rows.length){ alert("Nothing to export yet."); return; }
+    downloadFile((isMgr() ? "route-log-" : slug(meName()) + "-trips-") + todayISO() + ".csv", toCSV(rows, !isMgr()), "text/csv");
+  });
   $("btnCsvIn").addEventListener("click", function(){ $("fileCsv").click(); });
   $("fileCsv").addEventListener("change", async function(e){
     var f = e.target.files && e.target.files[0];
     if(!f) return;
-    var res = importCSV(await f.text());
+    var text = await f.text(), head = headOf(text), fallback = "";
     e.target.value = "";
-    if(res.bad){
-      alert("Couldn't read that file. It needs a header row with at least a Date column.");
-      return;
+    var hasDriver = ["driver","sub","substitute","sub driver"].some(function(h){ return head.indexOf(h) !== -1; });
+    if(isMgr() && head.indexOf("date") !== -1 && !hasDriver){
+      fallback = (prompt("This spreadsheet doesn't say who drove. Which sub is it from?") || "").trim();
+      if(!fallback) return;
     }
+    var res = importCSV(text, fallback);
+    if(res.bad){ alert("Couldn't read that file. It needs a header row with at least a Date column."); return; }
     render(); await save();
-    alert(res.added + " added, " + res.updated + " updated, " + res.skipped
-      + " skipped (already logged, or no usable date).");
+    alert(res.added + " added, " + res.updated + " updated, " + res.skipped + " skipped (already logged, or no usable date).");
   });
 
-  $("btnXCsv").addEventListener("click", function(){
-    var rows = exportRows();
-    if(!rows.length) return;
-    var tag = ($("xSchool").value || "trips").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
-    downloadFile(tag + "-" + todayISO() + ".csv", toCSV(rows), "text/csv");
-  });
-
-  $("btnBackup").addEventListener("click", function(){
-    downloadFile("route-log-backup-" + todayISO() + ".json",
-      JSON.stringify(state, null, 2), "application/json");
-  });
-
-  /* ---------- export ---------- */
-  function exportRows(){
-    var s = $("xSchool").value, f = $("xFrom").value, t = $("xTo").value, unpaidOnly = $("xUnpaid").checked;
-    return state.trips
-      .filter(function(x){
-        if(s && x.school !== s) return false;
-        if(f && x.date < f) return false;
-        if(t && x.date > t) return false;
-        if(unpaidOnly && x.paid) return false;
-        return true;
-      })
-      .sort(function(a,b){ return a.date.localeCompare(b.date); });
+  /* ---------- settings ---------- */
+  function openSettings(){
+    $("dName").value = state.me.name || ""; $("dPhone").value = state.me.phone || ""; $("dLicense").value = state.me.license || "";
+    $("bName").value = state.biz.name || ""; $("bAddress").value = state.biz.address || "";
+    $("bPhone").value = state.biz.phone || ""; $("bEmail").value = state.biz.email || "";
+    render();
+    open($("sheetSettings"));
   }
-  function updateCount(){
-    var r = exportRows();
-    var sum = r.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
-    $("xCount").textContent = r.length
-      ? r.length + (r.length === 1 ? " trip" : " trips") + ", " + money.format(sum) + " total."
-      : ($("xUnpaid").checked
-          ? "Everything for that school is already marked paid. Untick the box to send the full record."
-          : "No trips match. Widen the dates or pick another school.");
-    $("btnPrint").disabled = !r.length;
-  }
-  $("btnExport").addEventListener("click", function(){
-    var list = schools();
-    if(!list.length){ alert("Log a trip first — there's nothing to send yet."); return; }
-    $("xSchool").innerHTML = list.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+"</option>"; }).join("");
-    if($("fSchool").value) $("xSchool").value = $("fSchool").value;
-    $("xFrom").value = ""; $("xTo").value = "";
-    updateCount();
-    open($("sheetExport"), "xSchool");
-  });
-  ["xSchool","xFrom","xTo","xUnpaid"].forEach(function(i){ $(i).addEventListener("change", updateCount); });
-
-  $("btnPrint").addEventListener("click", function(){
-    var rows = exportRows();
-    if(!rows.length) return;
-    var school = $("xSchool").value;
-    var sum = rows.reduce(function(n,x){ return n + (+x.fee||0); }, 0);
-    var span = d(rows[0].date).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"})
-      + " – " + d(rows[rows.length-1].date).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"});
-    var who = state.driver.name || "Substitute driver";
-
-    var html = '<div class="rpt-head"><h1>Substitute driving record</h1>'
-      + '<div class="who"><strong>' + esc(school) + "</strong><br>"
-      + esc(who)
-      + (state.driver.license ? " &middot; ID " + esc(state.driver.license) : "")
-      + (state.driver.phone ? "<br>" + esc(state.driver.phone) : "")
-      + "</div>"
-      + '<div class="period">' + esc(span) + " &nbsp;|&nbsp; " + rows.length
-      + (rows.length === 1 ? " trip" : " trips") + "</div></div>"
-      + "<table><thead><tr><th>Date</th><th>Run</th><th>Bus</th><th>Color</th><th>Time</th><th>Status</th><th class='n'>Fee</th></tr></thead><tbody>";
-
-    var settled = 0;
-    rows.forEach(function(t){
-      var time = fmtTime(t.start) + (t.end ? " – " + fmtTime(t.end) : "");
-      if(t.paid) settled += (+t.fee || 0);
-      html += "<tr><td>" + d(t.date).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}) + "</td>"
-        + "<td>" + esc(t.run || "") + "</td>"
-        + "<td>" + esc(t.bus || "") + "</td>"
-        + "<td>" + esc(t.color || "") + "</td>"
-        + "<td>" + esc(time) + "</td>"
-        + "<td>" + (t.paid ? "Paid" + (t.paidOn ? " " + d(t.paidOn).toLocaleDateString(undefined,{month:"short",day:"numeric"}) : "") : "Outstanding") + "</td>"
-        + "<td class='n'>" + money.format(+t.fee||0) + "</td></tr>";
-      if(t.note){
-        html += '<tr><td colspan="7" style="padding-top:0;color:#444;font-size:11.5px">' + esc(t.note) + "</td></tr>";
-      }
-    });
-
-    html += "</tbody><tfoot>";
-    if(settled > 0 && settled < sum){
-      html += '<tr><td colspan="6">Trips billed</td><td class="n">' + money.format(sum) + "</td></tr>"
-        + '<tr class="q"><td colspan="6">Already paid</td><td class="n">&minus;' + money.format(settled) + "</td></tr>"
-        + '<tr><td colspan="6">Balance due</td><td class="n">' + money.format(sum - settled) + "</td></tr>";
-    } else if(settled >= sum){
-      html += '<tr><td colspan="6">Total, paid in full</td><td class="n">' + money.format(sum) + "</td></tr>";
-    } else {
-      html += '<tr><td colspan="6">Total due</td><td class="n">' + money.format(sum) + "</td></tr>";
+  $("btnSettings").addEventListener("click", openSettings);
+  $("btnCancelSettings").addEventListener("click", function(){ closeAll(); });
+  $("btnSaveSettings").addEventListener("click", async function(){
+    var oldName = state.me.name;
+    state.me = { name: val("dName"), phone: val("dPhone"), license: val("dLicense") };
+    state.biz = { name: val("bName"), address: val("bAddress"), phone: val("bPhone"), email: val("bEmail") };
+    if(state.me.name !== oldName){
+      state.routes.forEach(function(r){ if(r.mine) r.driver = meName(); });
     }
-    html += "</tfoot></table>"
-      + '<div class="sign"><div>Driver signature</div><div>School authorization</div><div>Date</div></div>';
-
-    $("report").innerHTML = html;
-    closeAll();
-    setTimeout(function(){ window.print(); }, 220);
+    closeAll(); render(); await save();
   });
+  $("btnBackup").addEventListener("click", function(){
+    downloadFile("route-log-backup-" + todayISO() + ".json", JSON.stringify(state, null, 2), "application/json");
+  });
+  $("btnRestore").addEventListener("click", function(){ $("fileRestore").click(); });
+  $("fileRestore").addEventListener("change", async function(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    var c = null;
+    try{ c = convert(JSON.parse(await f.text())); }catch(err){}
+    e.target.value = "";
+    if(!c){ alert("That file isn't a Route Log or Route Desk backup."); return; }
+    var added = absorb(c);
+    render(); await save();
+    alert(added + " added. Anything that matched was refreshed from the backup.");
+  });
+
+  /* ---------- scroll edge ---------- */
+  $("log").addEventListener("scroll", function(){
+    document.body.classList.toggle("scrolled", this.scrollTop > 2);
+  }, { passive:true });
 
   /* ---------- go ---------- */
+  if(window.__RL_TEST__){
+    window.__RL__ = { state:function(){ return state; }, toCSV:toCSV, importCSV:importCSV, convert:convert, absorb:absorb,
+                      exportRows:exportRows, buildReport:buildReport };
+  }
   (async function(){
     await load();
     render();
-
-    // Ask the browser not to evict the log. Chrome grants this to installed
-    // apps; Safari exempts home-screen apps from its 7-day storage sweep.
-    try{
-      if(navigator.storage && navigator.storage.persist) await navigator.storage.persist();
-    }catch(e){}
-
-    // Offline shell. Only runs when served over http(s) — opening the file
-    // directly still works, it just isn't installable.
+    if(!state.role) openWelcome();
+    try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch(e){}
     if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
       try{ await navigator.serviceWorker.register("sw.js"); }catch(e){}
     }
