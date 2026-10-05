@@ -679,6 +679,109 @@
   .controls .clearx{flex:none;width:40px;height:40px}
   .controls .clearx svg{width:15px;height:15px}
   @media (max-width:759px){ .filterbtn{padding:0 14px 0 11px} }
+
+  /* ===== Filter sheet: pages ===== */
+  #sheetFilter .sheethead{grid-template-columns:96px 1fr 96px}
+  .backbtn{display:inline-flex;align-items:center;gap:2px;padding:0 12px 0 6px}
+  .backbtn svg{width:18px;height:18px}
+  .fpage.in{animation:fpIn .28s cubic-bezier(.2,.9,.25,1)}
+  .fpage.out{animation:fpOut .28s cubic-bezier(.2,.9,.25,1)}
+  @keyframes fpIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+  @keyframes fpOut{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+  .seg3{display:flex;padding:3px;border-radius:999px;background:var(--fill)}
+  .seg3 button{flex:1;border:0;background:none;border-radius:999px;padding:8px 6px;font-size:15px;font-weight:600;color:var(--label2);transition:background .2s,color .2s}
+  .seg3 button[aria-checked="true"]{background:var(--thumb);color:var(--label);box-shadow:inset 0 1px 0 var(--spec),0 0 0 .5px var(--rim),0 3px 8px rgba(0,0,0,.12)}
+  #fpMain .form{margin-top:22px}
+  .row .val{flex:none;max-width:55%;margin-left:12px;color:var(--label2);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row.link .chev{margin-left:8px}
+  .searchrow{position:sticky;top:52px;z-index:2;margin:0 -16px;padding:2px 16px 8px;background:var(--sheet-solid)}
+  .searchrow input{
+    width:100%;height:40px;border:0;border-radius:12px;padding:0 12px 0 36px;font-size:16px;color:var(--label);outline:none;
+    background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") no-repeat 11px center/17px;
+  }
+  .searchrow input::placeholder{color:var(--label2)}
+  .searchrow + .form{margin-top:6px}
+  .ttl{display:block}
+  .he{color:var(--label2);font-weight:400;margin-left:8px}
+  .morebtn{display:block;width:100%;margin-top:4px;padding:12px;border:0;background:none;color:var(--blue);font-size:15px;font-weight:600;text-align:center;border-radius:12px}
+  @media (hover:hover){ .morebtn:hover{background:var(--fill)} }
+  @media (min-width:760px){ .searchrow{top:42px;margin:0 -18px;padding:2px 18px 8px} }
+  @media (max-width:759px){ .statcard .stat{padding:2px 12px} }
+
+  /* ===== two taps: options sit right on the main page ===== */
+  .headrow{display:flex;align-items:baseline;justify-content:space-between;margin:22px 16px 8px}
+  .headrow .head{margin:0}
+  .linkbtn{display:inline-flex;align-items:center;gap:3px;padding:2px 0;border:0;background:none;color:var(--blue);font-size:14px;font-weight:600}
+  .linkbtn .chev{background:var(--blue);width:7px;height:12px;margin-left:2px}
+  .chiprow{display:flex;gap:8px}
+  .chiprow.scroll{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:2px 16px 4px}
+  .chiprow.scroll::-webkit-scrollbar{display:none}
+  .chiprow.scroll::after{content:"";flex:none;width:6px}
+  .chiprow.wrap{flex-wrap:wrap}
+  .pchip{
+    flex:none;height:38px;padding:0 14px;border:0;border-radius:999px;white-space:nowrap;
+    background:var(--card);color:var(--label);font-size:15px;font-weight:600;
+    box-shadow:0 0 0 .5px var(--rim),0 1px 2px rgba(0,0,0,.05);transition:background .15s,box-shadow .15s,transform .15s;
+  }
+  .pchip:active{transform:scale(.95)}
+  .pchip[aria-pressed="true"]{background:var(--tint-soft);box-shadow:inset 0 0 0 1.5px var(--tint)}
+  @media (hover:hover){ .pchip:hover{filter:brightness(.98)} .linkbtn:hover{opacity:.8} }
+  @media (min-width:760px){ .chiprow.scroll{margin:0 -18px;padding:2px 18px 4px} }
+
+  /* ===== selecting several ===== */
+  .selbtn{margin-left:auto}
+  .tripmain{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .trip .selbox{display:none}
+  body.selecting .trip .selbox{
+    display:block;position:absolute;left:14px;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;
+    box-shadow:inset 0 0 0 1.6px var(--label3);z-index:2;pointer-events:none;transition:background .15s;
+  }
+  body.selecting .trip.picked .selbox{background:var(--blue);box-shadow:none}
+  body.selecting .trip.picked .selbox::after{
+    content:"";position:absolute;left:8.5px;top:5px;width:5.5px;height:10px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(45deg);
+  }
+  body.selecting .tripmain{padding-left:50px}
+  body.selecting .trip + .trip::before{left:94px}
+  body.selecting .paidbox{pointer-events:none;opacity:.45}
+  body.selecting .trip.picked{background:color-mix(in srgb,var(--blue) 9%,transparent)}
+  body.selecting .fab{display:none}
+  body.selecting main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+
+  .selbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 4px}
+  .selbar #selCount{font-size:15px;font-weight:600;text-align:center;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .selbar .textbtn{flex:none;height:40px;padding:0 16px}
+  .selbar .done{background:var(--tint);color:var(--tint-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 0 0 .5px rgba(0,0,0,.14)}
+
+  .selactions{
+    position:absolute;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:11;
+    display:flex;gap:4px;padding:6px;border-radius:26px;background:var(--glass-thick);
+    -webkit-backdrop-filter:blur(30px) saturate(190%);backdrop-filter:blur(30px) saturate(190%);
+    box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--float);
+  }
+  .actbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;border:0;background:none;border-radius:20px;color:var(--label);font-size:12px;font-weight:600}
+  .actbtn svg{width:23px;height:23px}
+  .actbtn.danger{color:var(--red)}
+  .actbtn:disabled{opacity:.32}
+  .actbtn:active:not(:disabled){background:var(--fill)}
+
+  .toast{
+    position:absolute;left:50%;transform:translateX(-50%);bottom:calc(80px + env(safe-area-inset-bottom));z-index:12;
+    display:flex;align-items:center;gap:14px;padding:8px 8px 8px 18px;border-radius:999px;white-space:nowrap;
+    background:rgba(28,28,30,.94);color:#fff;font-size:15px;font-weight:500;box-shadow:var(--float);
+  }
+  .toast button{border:0;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.16);color:#FFD60A;font-size:15px;font-weight:700}
+  @media (hover:hover){ .actbtn:hover:not(:disabled){background:var(--fill)} .toast button:hover{background:rgba(255,255,255,.24)} }
+  @media (min-width:760px){
+    .selactions{left:50%;right:auto;transform:translateX(-50%);width:440px;bottom:24px}
+    .selbar{padding:12px 28px 4px}
+    .toast{bottom:24px}
+  }
+  .row.mixed input[type=time]{color:transparent}
+  .row.mixed::after{content:"Mixed";position:absolute;right:46px;top:50%;transform:translateY(-50%);color:var(--label3);font-size:17px;pointer-events:none}
+
+  /* ===== undo / redo ===== */
+  .nav .iconbtn:disabled{opacity:.3;pointer-events:none;box-shadow:inset 0 0 0 .5px var(--rim)}
+  @media (max-width:759px){ .navbtns{gap:6px} .nav .iconbtn{width:38px;height:38px} }
 </style>
 </head>
 <body data-role="none">
@@ -697,6 +800,8 @@
     <div class="navbtns">
       <button class="pill glassy only-wide navpill" id="btnExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="exportLbl">Create invoice</span></button>
       <button class="pill tinted only-wide navpill" id="btnAddTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span id="addTopLbl">Log a trip</span></button>
+      <button class="iconbtn" id="btnUndo" aria-label="Undo" title="Undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4.5 9.5 9 5"/><path d="M4.5 9.5H14a5.5 5.5 0 0 1 0 11h-3"/></svg></button>
+      <button class="iconbtn" id="btnRedo" aria-label="Redo" title="Redo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l4.5-4.5L15 5"/><path d="M19.5 9.5H10a5.5 5.5 0 0 0 0 11h3"/></svg></button>
       <button class="iconbtn" id="btnSettings" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 3.9-5.4 7-5.4s5.8 1.8 7 5.4"/></svg></button>
     </div>
   </div>
@@ -714,10 +819,24 @@
   <button class="sortchip sort" id="btnSort" aria-label="Newest first. Tap to show oldest first." title="Newest first. Tap to flip."><span><span id="sortWord">Newest</span><span class="wide-word"> first</span></span><span id="sortArrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15M6 13.5l6 6 6-6"/></svg></span></button>
   <button class="fchip filterbtn" id="btnFilter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span id="filterLbl">Filter</span></button>
   <button class="iconbtn clearx" id="chipClear" aria-label="Clear filters" title="Clear filters" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+  <button class="fchip selbtn" id="btnSelect">Select</button>
+</div>
+
+<div class="selbar" id="selbar" hidden>
+  <button class="textbtn" id="selAll">Select all</button>
+  <span id="selCount" aria-live="polite"></span>
+  <button class="textbtn done" id="selDone">Done</button>
 </div>
 
 <main id="log"></main>
 
+<div class="selactions" id="selActions" hidden role="toolbar" aria-label="Selected trips">
+  <button class="actbtn" id="actPaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.7 2.7L16 9.7"/></svg><span>Paid</span></button>
+  <button class="actbtn" id="actUnpaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span>Unpaid</span></button>
+  <button class="actbtn" id="actEdit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5h4l10-10a2.1 2.1 0 0 0-3-3l-10 10v3z"/><path d="M13.5 8l3 3"/></svg><span>Edit</span></button>
+  <button class="actbtn danger" id="actDelete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg><span>Delete</span></button>
+</div>
+<div class="toast" id="toast" hidden role="status"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 <div class="fab"><button class="pill glassy" id="btnInvoice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="invoiceLbl">Create invoice</span></button><button class="pill tinted" id="btnAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Log a trip</span></button></div>
 </div><!-- /shell -->
 </div><!-- /stage -->
@@ -825,24 +944,75 @@
 <section class="sheet" id="sheetFilter" role="dialog" aria-modal="true" aria-labelledby="filtTitle">
   <div class="sheethead">
     <button class="textbtn" id="btnFiltClear">Clear</button>
+    <button class="textbtn backbtn" id="btnFiltBack" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg><span>Filter</span></button>
     <h3 id="filtTitle">Filter</h3>
     <button class="iconbtn tinted" id="btnFiltDone" aria-label="Done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
-  <p class="head" id="filtShowHead">Show</p>
-  <div class="form" id="filtShow"></div>
-  <p class="head" id="filtWhoHead">Schools</p>
-  <div class="form" id="filtWho"></div>
-  <p class="head" id="filtDateHead">Dates</p>
-  <div class="form" id="filtQuick"></div>
-  <p class="head">Your own range</p>
-  <div class="form">
-    <div class="row"><label for="filtFrom">From</label><input type="date" id="filtFrom"></div>
-    <div class="row"><label for="filtTo">To</label><input type="date" id="filtTo"></div>
+
+  <div class="fpage" id="fpMain">
+    <p class="head">Show</p>
+    <div class="seg3" id="filtShow" role="radiogroup" aria-label="Paid or unpaid"></div>
+    <div class="headrow"><p class="head" id="goWhoLbl">Schools</p><button class="linkbtn" id="goWho"><span id="goWhoTxt">See all</span><i class="chev"></i></button></div>
+    <div class="chiprow scroll" id="whoChips" role="group" aria-labelledby="goWhoLbl"></div>
+    <div class="headrow"><p class="head" id="dateHead">Dates</p><button class="linkbtn" id="goDate"><span>More</span><i class="chev"></i></button></div>
+    <div class="chiprow wrap" id="dateChips" role="group" aria-labelledby="dateHead"></div>
+    <p class="foot" id="filtCount"></p>
   </div>
-  <p class="head" id="filtMonthsHead">Months</p>
-  <div class="form" id="filtMonths"></div>
-  <p class="head" id="filtHebHead">Jewish months</p>
-  <div class="form" id="filtHeb"></div>
+
+  <div class="fpage" id="fpWho" hidden>
+    <div class="searchrow"><input type="search" id="whoSearch" placeholder="Search" autocomplete="off" aria-label="Search"></div>
+    <div class="form" id="filtWho"></div>
+    <p class="foot" id="whoEmpty" hidden>Nothing matches.</p>
+  </div>
+
+  <div class="fpage" id="fpDate" hidden>
+    <div class="searchrow"><input type="search" id="dateSearch" placeholder="Search months, like Elul or 2026" autocomplete="off" aria-label="Search months"></div>
+    <div id="dateFixed">
+      <div class="form" id="filtQuick"></div>
+      <p class="head">Your own range</p>
+      <div class="form">
+        <div class="row"><label for="filtFrom">From</label><input type="date" id="filtFrom"></div>
+        <div class="row"><label for="filtTo">To</label><input type="date" id="filtTo"></div>
+      </div>
+    </div>
+    <p class="head" id="filtMonthsHead">Months</p>
+    <div class="form" id="filtMonths"></div>
+    <button class="morebtn" id="moreMonths" hidden></button>
+    <p class="head" id="filtHebHead">Jewish months</p>
+    <div class="form" id="filtHeb"></div>
+    <button class="morebtn" id="moreHeb" hidden></button>
+    <p class="foot" id="dateEmpty" hidden>No months match.</p>
+  </div>
+</section>
+
+<!-- edit several at once -->
+<section class="sheet" id="sheetBulk" role="dialog" aria-modal="true" aria-labelledby="bulkTitle">
+  <div class="sheethead">
+    <button class="iconbtn" id="btnBulkCancel" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <h3 id="bulkTitle">Edit trips</h3>
+    <button class="iconbtn tinted" id="btnBulkSave" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+  </div>
+  <p class="foot" style="margin:2px 16px 0">Only what you change is updated. "Mixed" means they differ; leave it and each keeps its own.</p>
+  <div class="form">
+    <div class="row"><label for="bkSchool">School</label><input type="text" id="bkSchool" list="schoolList" autocomplete="off"></div>
+    <div class="row mgr-only"><label for="bkDriver">Driven by</label><input type="text" id="bkDriver" list="driverList" autocomplete="off"></div>
+    <div class="row"><label for="bkRoute">Route</label><input type="text" id="bkRoute" autocomplete="off"></div>
+  </div>
+  <div class="form">
+    <div class="row sel"><label for="bkRun">Run</label><select id="bkRun">
+        <option value="__mixed">Mixed</option>
+        <option value="AM">AM</option><option value="PM">PM</option><option value="Midday">Midday</option>
+        <option value="Field trip">Field trip</option><option value="Sports">Sports</option><option value="">None</option>
+      </select></div>
+    <div class="row"><label for="bkStart">Start</label><input type="time" id="bkStart"></div>
+    <div class="row"><label for="bkEnd">End</label><input type="time" id="bkEnd"></div>
+    <div class="row"><label for="bkBus">Bus</label><input type="text" id="bkBus" inputmode="numeric"></div>
+    <div class="row"><label for="bkColor">Color</label><input type="text" id="bkColor" list="colorList" autocomplete="off"></div>
+  </div>
+  <div class="form">
+    <div class="row"><label for="bkPay"><span class="sub-only">Fee</span><span class="mgr-only">Pay to driver</span></label><input type="number" id="bkPay" inputmode="decimal" step="0.01" min="0"></div>
+    <div class="row mgr-only"><label for="bkRate">Bill to school</label><input type="number" id="bkRate" inputmode="decimal" step="0.01" min="0"></div>
+  </div>
 </section>
 
 <!-- settings -->
@@ -965,6 +1135,7 @@
     describeStore();
   }
   async function save(){
+    trackHistory();
     try{ await writeRaw(JSON.stringify(state)); }
     catch(e){
       store = "memory"; memValue = JSON.stringify(state);
@@ -1193,6 +1364,8 @@
   function render(){
     var v = view(), c = cfg(), mgr = isMgr();
     document.body.dataset.role = state.role || "none";
+    paintSel();
+    paintHistory();
     $("viewTitle").textContent = c.title;
     ["Drivers","Schools"].forEach(function(n){
       var on = v === n.toLowerCase() ? "true" : "false";
@@ -1245,6 +1418,7 @@
     $("sOwedLbl").textContent = owed > 0 ? c.owed : "all settled";
     $("sOwed").style.color = owed > 0 ? "var(--bus)" : "";
     $("sMargin").textContent = money.format(billed - payout);
+    fitStats();
 
     var unpaid = list.filter(function(r){ return !isPaid(r); }), bulk = $("bulkPay"), canBulk = unpaid.length > 1;
     var bulkWords = "Mark " + unpaid.length + " " + c.noun[1] + " paid" + (fwv ? (v === "drivers" ? " to " : " by ") + fwv : "");
@@ -1275,7 +1449,7 @@
       var dt = d(r.date), rgb = resolveColor(r.color), paid = isPaid(r);
       var bits = [other(r), r.route ? "Rt " + r.route : "", timeSpan(r), r.run]
         .filter(Boolean).map(function(b){ return "<span>" + esc(b) + "</span>"; }).join("");
-      html += '<div class="trip' + (paid ? " is-paid" : "") + '">'
+      html += '<div class="trip' + (paid ? " is-paid" : "") + (sel && sel[r.id] ? " picked" : "") + '"><span class="selbox" aria-hidden="true"></span>'
         + '<button class="tripmain" data-id="' + esc(r.id) + '">'
         + '<span class="date"><span class="dow">' + dt.toLocaleDateString(undefined,{weekday:"short"}) + "</span>"
         + '<span class="dnum">' + dt.getDate() + "</span></span>"
@@ -1301,7 +1475,7 @@
   function closeAll(force){
     if(!force && $("sheetWelcome").classList.contains("on")) return;   // first launch needs an answer
     $("scrim").classList.remove("on");
-    ["sheetWelcome","sheetTrip","sheetExport","sheetSettings","sheetFilter"].forEach(function(i){ $(i).classList.remove("on"); });
+    ["sheetWelcome","sheetTrip","sheetExport","sheetSettings","sheetFilter","sheetBulk"].forEach(function(i){ $(i).classList.remove("on"); });
   }
   $("scrim").addEventListener("click", function(){ closeAll(); });
   document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeAll(); });
@@ -1350,7 +1524,7 @@
       d.el.style.transform = "";  $("scrim").style.opacity = "";
       if(d.dy > d.h / 3 || (speed > 0.5 && d.dy > 40)) closeAll();   // otherwise it springs back
     }
-    ["sheetTrip","sheetExport","sheetSettings","sheetFilter"].forEach(function(id){
+    ["sheetTrip","sheetExport","sheetSettings","sheetFilter","sheetBulk"].forEach(function(id){
       var el = $(id);
       el.addEventListener("touchstart", start, { passive:true });
       el.addEventListener("touchmove", move, { passive:false });
@@ -1361,6 +1535,212 @@
       if(Date.now() < swallowClickUntil){ e.stopPropagation(); e.preventDefault(); }
     }, true);
   })();
+
+  /* ---------- selecting several trips: tick them, then mark paid, edit, or delete together ---------- */
+  var sel = null, pressTimer = null, pressXY = null, pressFired = false, swallowLogUntil = 0;
+  function words(n){ var noun = cfg().noun; return n + " " + noun[n === 1 ? 0 : 1]; }
+  function selectedRoutes(){ return sel ? state.routes.filter(function(r){ return sel[r.id]; }) : []; }
+  function startSelect(firstId){ sel = {}; if(firstId) sel[firstId] = true; render(); }
+  function endSelect(){ sel = null; render(); }
+  function toggleSel(id){ if(sel[id]) delete sel[id]; else sel[id] = true; render(); }
+  function paintSel(){
+    var on = !!sel;
+    document.body.classList.toggle("selecting", on);
+    $("controls").hidden = on; $("selbar").hidden = !on; $("selActions").hidden = !on;
+    if(!on) return;
+    var n = Object.keys(sel).length, vis = filtered();
+    $("selCount").textContent = n ? words(n) + " selected" : "Tap to select";
+    $("selAll").textContent = vis.length && vis.every(function(r){ return sel[r.id]; }) ? "Deselect all" : "Select all";
+    ["actPaid","actUnpaid","actEdit","actDelete"].forEach(function(id){ $(id).disabled = !n; });
+  }
+  $("btnSelect").addEventListener("click", function(){ startSelect(); });
+  $("selDone").addEventListener("click", endSelect);
+  $("selAll").addEventListener("click", function(){
+    var vis = filtered(), all = vis.length && vis.every(function(r){ return sel[r.id]; });
+    vis.forEach(function(r){ if(all) delete sel[r.id]; else sel[r.id] = true; });
+    render();
+  });
+  // Escape leaves selecting, but only once any open sheet is closed
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && sel && !$("scrim").classList.contains("on")) endSelect();
+  }, true);
+
+  // press and hold a trip to start selecting with it
+  $("log").addEventListener("touchstart", function(e){
+    var row = e.target.closest(".tripmain");
+    if(!row || sel || e.touches.length !== 1) return;
+    pressXY = [e.touches[0].clientX, e.touches[0].clientY];
+    clearTimeout(pressTimer);
+    pressTimer = setTimeout(function(){
+      pressTimer = null;
+      pressFired = true;
+      swallowLogUntil = Date.now() + 1500;         // until the finger lifts (see touchend), with a backstop
+      try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){}
+      // switch modes without redrawing the list: the finger is still on this row, and the lift has to reach it
+      sel = {}; sel[row.dataset.id] = true;
+      paintSel();
+      var t = row.closest(".trip"); if(t) t.classList.add("picked");
+    }, 480);
+  }, { passive:true });
+  $("log").addEventListener("touchmove", function(e){
+    if(!pressTimer) return;
+    var t = e.touches[0];
+    if(Math.abs(t.clientX - pressXY[0]) > 10 || Math.abs(t.clientY - pressXY[1]) > 10){ clearTimeout(pressTimer); pressTimer = null; }
+  }, { passive:true });
+  ["touchend","touchcancel"].forEach(function(ev){
+    $("log").addEventListener(ev, function(){
+      clearTimeout(pressTimer); pressTimer = null;
+      // ignore only the tap that comes from lifting the held finger
+      if(pressFired){ pressFired = false; swallowLogUntil = Date.now() + 250; }
+    }, { passive:true });
+  });
+  $("log").addEventListener("contextmenu", function(e){ if(e.target.closest(".tripmain")) e.preventDefault(); });
+
+  // bulk actions save like everything else, so the shared undo history covers them (see undo/redo)
+  function snapshot(){}
+
+  async function bulkPaid(v){
+    var list = selectedRoutes(); if(!list.length) return;
+    snapshot();
+    list.forEach(function(r){ setPaid(r, v); });
+    sel = null; render(); await save();
+    toast("Marked " + words(list.length) + (v ? " paid" : " unpaid"));
+  }
+  $("actPaid").addEventListener("click", function(){ bulkPaid(true); });
+  $("actUnpaid").addEventListener("click", function(){ bulkPaid(false); });
+  $("actDelete").addEventListener("click", async function(){
+    var list = selectedRoutes(); if(!list.length) return;
+    if(!confirm("Delete " + words(list.length) + "? You can undo right after.")) return;
+    snapshot();
+    var gone = {}; list.forEach(function(r){ gone[r.id] = true; });
+    state.routes = state.routes.filter(function(r){ return !gone[r.id]; });
+    if(gone[state.lastId]) state.lastId = "";
+    sel = null; render(); await save();
+    toast("Deleted " + words(list.length));
+  });
+
+  // edit several: shared values show, differing ones say Mixed, and only what you change is written
+  var BK = [["bkSchool","school"],["bkDriver","driver"],["bkRoute","route"],["bkRun","run"],["bkStart","start"],
+            ["bkEnd","end"],["bkBus","bus"],["bkColor","color"],["bkPay","pay"],["bkRate","rate"]];
+  var bkInit = {};
+  $("actEdit").addEventListener("click", function(){
+    var list = selectedRoutes(); if(!list.length) return;
+    $("bulkTitle").textContent = "Edit " + words(list.length);
+    BK.forEach(function(p){
+      var el = $(p[0]), vals = {};
+      list.forEach(function(r){ vals[String(r[p[1]] == null ? "" : r[p[1]])] = 1; });
+      var keys = Object.keys(vals), same = keys.length === 1;
+      if(el.tagName === "SELECT") setSelect(el, same ? keys[0] : "__mixed");
+      else { el.value = same ? keys[0] : ""; el.placeholder = same ? "" : "Mixed"; }
+      // time fields can't show placeholder text, so their row says Mixed until you pick a time
+      if(el.type === "time") el.closest(".row").classList.toggle("mixed", !same);
+      bkInit[p[0]] = el.value;
+    });
+    open($("sheetBulk"), "bkBus");
+  });
+  $("btnBulkCancel").addEventListener("click", function(){ closeAll(); });
+  $("btnBulkSave").addEventListener("click", async function(){
+    var list = selectedRoutes(), mgr = isMgr(), edits = {};
+    BK.forEach(function(p){
+      var v = $(p[0]).value, f = p[1];
+      if(v === bkInit[p[0]] || v === "__mixed") return;
+      if(!mgr && (f === "driver" || f === "rate")) return;
+      edits[f] = (f === "pay" || f === "rate") ? (v === "" ? 0 : (+v || 0)) : (f === "run" ? v : v.trim());
+    });
+    var keys = Object.keys(edits);
+    if(!keys.length || !list.length){ closeAll(); return; }
+    snapshot();
+    list.forEach(function(r){
+      keys.forEach(function(k){ r[k] = edits[k]; });
+      if(!mgr && "pay" in edits) r.rate = r.pay;                      // a sub's fee is what the school owes
+      if(mgr && "driver" in edits) r.mine = !!(state.me.name && r.driver === state.me.name);
+    });
+    closeAll(); sel = null; render(); await save();
+    toast("Updated " + words(list.length));
+  });
+  ["bkStart","bkEnd"].forEach(function(id){
+    ["input","change","focus"].forEach(function(ev){ $(id).addEventListener(ev, function(){ this.closest(".row").classList.remove("mixed"); }); });
+  });
+
+  /* ---------- undo / redo: every change to your data, the last 30 steps, until you close the app ---------- */
+  var undoStack = [], redoStack = [], lastData = null, toastTimer = null, toastFn = null;
+  function dataJSON(){ return JSON.stringify({ routes: state.routes, lastId: state.lastId, me: state.me, biz: state.biz }); }
+  function applyData(json){
+    var x = JSON.parse(json);
+    state.routes = x.routes; state.lastId = x.lastId; state.me = x.me; state.biz = x.biz;
+  }
+  function resetHistory(){ undoStack = []; redoStack = []; lastData = dataJSON(); paintHistory(); }
+  // save() calls this: if the data changed since last time, that's one step
+  function trackHistory(){
+    if(lastData == null) return;
+    var cur = dataJSON();
+    if(cur === lastData) return;
+    undoStack.push(lastData);
+    if(undoStack.length > 30) undoStack.shift();
+    redoStack = [];
+    lastData = cur;
+    paintHistory();
+  }
+  function paintHistory(){
+    $("btnUndo").disabled = !undoStack.length;
+    $("btnRedo").disabled = !redoStack.length;
+  }
+  // what an undo or redo did, in a few words
+  function describe(fromJSON, toJSON){
+    var a = JSON.parse(fromJSON), b = JSON.parse(toJSON), A = {}, B = {}, back = 0, gone = 0, changed = 0;
+    a.routes.forEach(function(r){ A[r.id] = JSON.stringify(r); });
+    b.routes.forEach(function(r){ B[r.id] = JSON.stringify(r); });
+    Object.keys(B).forEach(function(id){ if(!(id in A)) back++; else if(A[id] !== B[id]) changed++; });
+    Object.keys(A).forEach(function(id){ if(!(id in B)) gone++; });
+    var parts = [];
+    if(changed) parts.push(words(changed) + " changed");
+    if(back) parts.push(words(back) + " back");
+    if(gone) parts.push(words(gone) + " removed");
+    if(!parts.length) parts.push(JSON.stringify(a.me) !== JSON.stringify(b.me) || JSON.stringify(a.biz) !== JSON.stringify(b.biz) ? "your details" : "last change");
+    return parts.join(", ");
+  }
+  async function step(from, to, verb, againLabel, again){
+    if(!from.length) return;
+    var cur = dataJSON(), next = from.pop();
+    to.push(cur);
+    applyData(next);
+    lastData = next;
+    sel = null;
+    render(); paintHistory();
+    await save();
+    toast(verb + ": " + describe(cur, next), againLabel, again);
+  }
+  function doUndo(){ return step(undoStack, redoStack, "Undone", "Redo", doRedo); }
+  function doRedo(){ return step(redoStack, undoStack, "Redone", "Undo", doUndo); }
+  $("btnUndo").addEventListener("click", doUndo);
+  $("btnRedo").addEventListener("click", doRedo);
+
+  // the bar at the bottom: says what happened, with one button to reverse it
+  function toast(msg, label, fn){
+    $("toastMsg").textContent = msg;
+    $("toastUndo").textContent = label || "Undo";
+    toastFn = fn || doUndo;
+    $("toast").hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ $("toast").hidden = true; toastFn = null; }, 5000);
+  }
+  $("toastUndo").addEventListener("click", function(){
+    var f = toastFn; toastFn = null;
+    clearTimeout(toastTimer); $("toast").hidden = true;
+    if(f) f();
+  });
+
+  // keyboard: Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y. Inside a field the field keeps its own undo.
+  document.addEventListener("keydown", function(e){
+    if(!(e.metaKey || e.ctrlKey) || e.altKey) return;
+    var k = (e.key || "").toLowerCase();
+    if(k !== "z" && k !== "y") return;
+    var t = e.target;
+    if(t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+    if($("scrim").classList.contains("on")) return;
+    e.preventDefault();
+    if(k === "y" || e.shiftKey) doRedo(); else doUndo();
+  });
 
   /* ---------- first launch ---------- */
   function openWelcome(){
@@ -1391,6 +1771,7 @@
       if(pendingImport.desk && pendingImport.log) state.sort = "desc";
       pendingImport = null;
     }
+    resetHistory();
     closeAll(true); render(); await save();
   });
 
@@ -1405,7 +1786,7 @@
     if(!confirm(msg)) return;
     state.role = r;
     state.tab = "drivers";
-    filt.who = [];
+    filt.who = []; sel = null;
     render(); $("log").scrollTop = 0;
     await save();
   }
@@ -1415,7 +1796,7 @@
   function setTab(t){
     if(!isMgr() || state.tab === t) return;
     state.tab = t;
-    filt.who = [];
+    filt.who = []; sel = null;
     render(); $("log").scrollTop = 0;
     save();
   }
@@ -1592,6 +1973,12 @@
 
   /* ---------- list ---------- */
   $("log").addEventListener("click", async function(e){
+    if(Date.now() < swallowLogUntil) return;
+    if(sel){
+      var t = e.target.closest(".trip");
+      if(t) toggleSel(t.querySelector(".tripmain").dataset.id);
+      return;
+    }
     var box = e.target.closest(".paidbox");
     if(box){
       var r = find(box.dataset.pay);
@@ -1616,22 +2003,94 @@
     state.sort = state.sort === "asc" ? "desc" : "asc";
     render(); $("log").scrollTop = 0; await save();
   });
-  /* ---------- the Filter sheet: changes apply as you tap ---------- */
+  /* ---------- the Filter sheet: a short main page; Schools and Dates are one tap deeper, each searchable ---------- */
   var CHECK = $("setSub").querySelector(".ck").innerHTML;
-  function opt(k, v, label, sub, on){
+  var LIMIT = 6, showAllMonths = false, showAllHeb = false;
+  // other spellings people type for Jewish months
+  var HEB_ALIASES = { Tishrei:"tishri tishrei", Cheshvan:"heshvan cheshvan marcheshvan", Tevet:"tevet teves", Shevat:"shevat shvat",
+                      Nisan:"nisan nissan", Iyar:"iyar iyyar", Tammuz:"tammuz tamuz", Av:"av menachem", Kislev:"kislev", Sivan:"sivan", Elul:"elul", Adar:"adar" };
+  function opt(k, v, label, sub, on, he){
     return '<button class="row link radio" data-k="' + k + '" data-v="' + esc(v) + '" role="menuitemcheckbox" aria-checked="' + (on ? "true" : "false") + '">'
-      + '<span class="lbl">' + esc(label) + (sub ? '<small class="rsub">' + esc(sub) + "</small>" : "") + "</span>"
+      + '<span class="lbl"><span class="ttl">' + esc(label) + (he ? '<span class="he">' + esc(he) + "</span>" : "") + "</span>"
+      + (sub ? '<small class="rsub">' + esc(sub) + "</small>" : "") + "</span>"
       + '<span class="ck">' + CHECK + "</span></button>";
   }
-  function renderFilterSheet(){
-    var c = cfg(), vis = visible(), f = filt.date;
-    $("filtShow").innerHTML =
-        opt("status", "all",    "Paid and unpaid", "", filt.status === "all")
-      + opt("status", "unpaid", "Unpaid only",     "", filt.status === "unpaid")
-      + opt("status", "paid",   "Paid only",       "", filt.status === "paid");
-    $("filtWhoHead").textContent = c.who === "driver" ? "Drivers" : "Schools";
-    $("filtWho").innerHTML = opt("who", "", c.all, "", !filt.who.length)
-      + uniqOf(vis, c.who).map(function(n){ return opt("who", n, n, "", filt.who.indexOf(n) !== -1); }).join("");
+  function norm(s){ return String(s || "").toLowerCase(); }
+  function hit(q, hay){ return !q || norm(hay).indexOf(q) !== -1; }
+  // the first few, plus whatever's picked if it's further down
+  function pinLimit(arr, picked){
+    var top = arr.slice(0, LIMIT), sel = arr.filter(picked)[0];
+    if(sel && top.indexOf(sel) === -1) top.push(sel);
+    return top;
+  }
+
+  // a chip on the main page: one tap applies it; date chips clear when tapped again
+  function chip(k, v, label, on, toggle, near){
+    return '<button class="pchip" data-k="' + k + '" data-v="' + esc(v) + '"' + (toggle ? ' data-toggle="1"' : "")
+      + (near ? ' data-near="' + near + '"' : "") + ' aria-pressed="' + (on ? "true" : "false") + '">' + esc(label) + "</button>";
+  }
+  function renderMain(){
+    var c = cfg(), vis = visible(), total = vis.length, n = filtered().length, f = filt.date;
+    $("filtShow").innerHTML = [["all","All"],["unpaid","Unpaid"],["paid","Paid"]].map(function(o){
+      return '<button data-k="status" data-v="' + o[0] + '" role="radio" aria-checked="' + (filt.status === o[0] ? "true" : "false") + '">' + o[1] + "</button>";
+    }).join("");
+
+    // schools or drivers: ticked first, then the ones you use most
+    var uses = {}; vis.forEach(function(r){ var k = who(r); if(k) uses[k] = (uses[k] || 0) + 1; });
+    var names = Object.keys(uses).sort(function(a, b){
+      var pa = filt.who.indexOf(a) !== -1, pb = filt.who.indexOf(b) !== -1;
+      if(pa !== pb) return pa ? -1 : 1;
+      return (uses[b] - uses[a]) || a.localeCompare(b);
+    });
+    $("goWhoLbl").textContent = c.who === "driver" ? "Drivers" : "Schools";
+    $("goWhoTxt").textContent = "See all " + names.length;
+    $("whoChips").innerHTML = chip("who", "", c.all, !filt.who.length)
+      + names.map(function(nm){ return chip("who", nm, nm, filt.who.indexOf(nm) !== -1); }).join("");
+    $("whoChips").scrollLeft = 0;   // ticked ones move to the front, so start from there
+
+    // dates: the common ranges, this Jewish month and last, and whatever you picked on the full page
+    var t = todayISO(), cur = heb(t), curStart = cur ? hebRange(cur.key, t)[0] : null;
+    var prevNear = curStart ? addDays(curStart, -1) : null, prev = prevNear ? heb(prevNear) : null;
+    var onCur = f.kind === "heb" && cur && f.key === cur.key, onPrev = f.kind === "heb" && prev && f.key === prev.key;
+    var chips = [chip("date", "all", "All dates", f.kind === "all")];
+    if(f.kind === "month" || f.kind === "range" || (f.kind === "heb" && !onCur && !onPrev)) chips.push(chip("date", "all", dateLabel(f), true));
+    ["thisweek","lastweek","thismonth","lastmonth"].forEach(function(k){ chips.push(chip("date", k, DATE_WORDS[k], f.kind === k, true)); });
+    if(cur) chips.push(chip("heb", cur.key, cur.label, onCur, true, t));
+    if(prev) chips.push(chip("heb", prev.key, prev.label, onPrev, true, prevNear));
+    $("dateChips").innerHTML = chips.join("");
+
+    $("filtCount").textContent = "Showing " + n + " of " + total + " " + c.noun[total === 1 ? 0 : 1] + ".";
+  }
+
+  function renderWho(){
+    var c = cfg(), q = norm($("whoSearch").value.trim()), names = uniqOf(visible(), c.who);
+    var picked = names.filter(function(n){ return filt.who.indexOf(n) !== -1; });
+    var list = (q ? names : picked.concat(names.filter(function(n){ return filt.who.indexOf(n) === -1; })))
+      .filter(function(n){ return hit(q, n); });
+    $("whoSearch").placeholder = c.who === "driver" ? "Search drivers" : "Search schools";
+    $("filtWho").innerHTML = (q ? "" : opt("who", "", c.all, "", !filt.who.length))
+      + list.map(function(n){ return opt("who", n, n, "", filt.who.indexOf(n) !== -1); }).join("");
+    $("filtWho").hidden = !$("filtWho").innerHTML;
+    $("whoEmpty").hidden = !(q && !list.length);
+  }
+
+  function monthsList(){
+    var mk = {}; visible().forEach(function(r){ if(r.date) mk[monthKey(r.date)] = 1; });
+    return Object.keys(mk).sort().reverse();
+  }
+  function hebList(){
+    var hm = {}, keys = [];
+    [todayISO()].concat(visible().map(function(r){ return r.date; })).forEach(function(s){
+      var h = heb(s); if(!h) return;
+      if(!hm[h.key]){ hm[h.key] = { key:h.key, label:h.label, he:h.he, near:s, last:s }; keys.push(h.key); }
+      if(s > hm[h.key].last) hm[h.key].last = s;
+    });
+    keys.sort(function(a,b){ return hm[b].last.localeCompare(hm[a].last); });
+    return keys.map(function(k){ var x = hm[k]; x.span = hebRange(k, x.near); return x; });
+  }
+  function renderDates(){
+    var f = filt.date, q = norm($("dateSearch").value.trim());
+    $("dateFixed").hidden = !!q;
     $("filtQuick").innerHTML = ["all","thisweek","lastweek","thismonth","lastmonth"].map(function(k){
       var rg = k === "all" ? null : rangeOf({ kind:k });
       return opt("date", k, DATE_WORDS[k], rg ? shortRange(rg[0], rg[1]) : "", f.kind === k);
@@ -1639,22 +2098,49 @@
     $("filtFrom").value = f.kind === "range" ? (f.from || "") : "";
     $("filtTo").value = f.kind === "range" ? (f.to || "") : "";
 
-    var mk = {}; vis.forEach(function(r){ if(r.date) mk[monthKey(r.date)] = 1; });
-    var months = Object.keys(mk).sort().reverse();
-    $("filtMonthsHead").hidden = $("filtMonths").hidden = !months.length;
-    $("filtMonths").innerHTML = months.map(function(m){ return opt("month", m, monthName(m), "", f.kind === "month" && f.key === m); }).join("");
-
-    // Jewish months you have trips in, plus the current one, newest first
-    var hm = {}, keys = [];
-    [todayISO()].concat(vis.map(function(r){ return r.date; })).forEach(function(s){
-      var h = heb(s); if(!h) return;
-      if(!hm[h.key]){ hm[h.key] = { label:h.label, he:h.he, near:s, last:s }; keys.push(h.key); }
-      if(s > hm[h.key].last) hm[h.key].last = s;
+    var months = monthsList().filter(function(m){
+      return hit(q, monthName(m) + " " + m + " " + d(m + "-01").toLocaleDateString(undefined, { month:"short", year:"numeric" }));
     });
-    keys.sort(function(a,b){ return hm[b].last.localeCompare(hm[a].last); });
-    $("filtHebHead").hidden = $("filtHeb").hidden = !keys.length;
-    $("filtHeb").innerHTML = keys.map(function(k){ var h = hm[k]; return opt("heb", k, h.label, h.he, f.kind === "heb" && f.key === k); }).join("");
+    var mShow = (q || showAllMonths) ? months : pinLimit(months, function(m){ return f.kind === "month" && f.key === m; });
+    $("filtMonths").innerHTML = mShow.map(function(m){ return opt("month", m, monthName(m), "", f.kind === "month" && f.key === m); }).join("");
+    $("filtMonthsHead").hidden = $("filtMonths").hidden = !mShow.length;
+    $("moreMonths").hidden = !!q || showAllMonths || months.length <= LIMIT;
+    $("moreMonths").textContent = "Show all " + months.length + " months";
+
+    var hl = hebList().filter(function(x){
+      var name = x.label.replace(/\s\d+$/, ""), base = name.replace(/ I+$/, "");
+      return hit(q, [x.label, x.he, HEB_ALIASES[base] || "", x.span[0].slice(0,4), x.span[1].slice(0,4), shortRange(x.span[0], x.span[1])].join(" "));
+    });
+    var hShow = (q || showAllHeb) ? hl : pinLimit(hl, function(x){ return f.kind === "heb" && f.key === x.key; });
+    $("filtHeb").innerHTML = hShow.map(function(x){
+      return opt("heb", x.key, x.label, shortRange(x.span[0], x.span[1]), f.kind === "heb" && f.key === x.key, x.he);
+    }).join("");
+    $("filtHebHead").hidden = $("filtHeb").hidden = !hShow.length;
+    $("moreHeb").hidden = !!q || showAllHeb || hl.length <= LIMIT;
+    $("moreHeb").textContent = "Show all " + hl.length + " Jewish months";
+    $("dateEmpty").hidden = !(q && !months.length && !hl.length);
   }
+  function renderFilterSheet(){ renderMain(); renderWho(); renderDates(); }
+
+  var PAGES = { main:"fpMain", who:"fpWho", date:"fpDate" };
+  function goPage(p, back){
+    Object.keys(PAGES).forEach(function(k){ var el = $(PAGES[k]); el.hidden = k !== p; el.classList.remove("in","out"); });
+    var el = $(PAGES[p]); void el.offsetWidth; el.classList.add(back ? "out" : "in");
+    $("btnFiltClear").hidden = p !== "main";
+    $("btnFiltBack").hidden = p === "main";
+    $("filtTitle").textContent = p === "main" ? "Filter" : (p === "who" ? $("goWhoLbl").textContent : "Dates");
+    $("sheetFilter").scrollTop = 0;
+    var desk = window.matchMedia && window.matchMedia("(hover:hover) and (min-width:760px)").matches;
+    if(desk && p !== "main") setTimeout(function(){ $(p === "who" ? "whoSearch" : "dateSearch").focus(); }, 60);
+  }
+  $("goWho").addEventListener("click", function(){ goPage("who"); });
+  $("goDate").addEventListener("click", function(){ goPage("date"); });
+  $("btnFiltBack").addEventListener("click", function(){ renderMain(); goPage("main", true); });
+  $("whoSearch").addEventListener("input", renderWho);
+  $("dateSearch").addEventListener("input", renderDates);
+  $("moreMonths").addEventListener("click", function(){ showAllMonths = true; renderDates(); });
+  $("moreHeb").addEventListener("click", function(){ showAllHeb = true; renderDates(); });
+
   function applyFilters(){ render(); renderFilterSheet(); $("log").scrollTop = 0; }
   $("sheetFilter").addEventListener("click", function(e){
     var b = e.target.closest("[data-k]");
@@ -1665,12 +2151,15 @@
       if(!v) filt.who = [];
       else { var i = filt.who.indexOf(v); if(i === -1) filt.who.push(v); else filt.who.splice(i, 1); }
     }
-    else if(k === "date") filt.date = { kind:v };
+    else if(k === "date") filt.date = (b.dataset.toggle && filt.date.kind === v) ? { kind:"all" } : { kind:v };
     else if(k === "month") filt.date = { kind:"month", key:v };
     else if(k === "heb"){
-      var near = [todayISO()].concat(visible().map(function(r){ return r.date; }))
-        .filter(function(s){ var h = heb(s); return h && h.key === v; })[0];
-      filt.date = { kind:"heb", key:v, label:heb(near).label, near:near };
+      if(b.dataset.toggle && filt.date.kind === "heb" && filt.date.key === v) filt.date = { kind:"all" };
+      else {
+        var near = b.dataset.near || [todayISO()].concat(visible().map(function(r){ return r.date; }))
+          .filter(function(s){ var h = heb(s); return h && h.key === v; })[0];
+        filt.date = { kind:"heb", key:v, label:heb(near).label, near:near };
+      }
     }
     applyFilters();
   });
@@ -1681,17 +2170,18 @@
       applyFilters();
     });
   });
-  function openFilters(sec){
-    renderFilterSheet();
+  function openFilters(){
+    $("whoSearch").value = ""; $("dateSearch").value = "";
+    showAllMonths = showAllHeb = false;
+    renderFilterSheet(); goPage("main");
     open($("sheetFilter"));
-    var h = sec && $(sec);
-    if(h) setTimeout(function(){ $("sheetFilter").scrollTop = Math.max(0, h.offsetTop - 72); }, 30);
   }
   $("btnFilter").addEventListener("click", function(){ openFilters(); });
   function clearFilters(){ filt = { who:[], date:{ kind:"all" }, status:"all" }; applyFilters(); }
   $("chipClear").addEventListener("click", clearFilters);
   $("btnFiltClear").addEventListener("click", clearFilters);
   $("btnFiltDone").addEventListener("click", function(){ closeAll(); });
+
   // the chip line scrolls sideways on narrow phones: fade the edge while there's more, start from the left again after a sheet
   function fadeChips(){
     var ctl = $("controls"), more = ctl.scrollWidth > ctl.clientWidth + 2;
@@ -1702,6 +2192,17 @@
   $("scrim").addEventListener("transitionend", function(){
     if(!$("scrim").classList.contains("on")){ $("controls").scrollLeft = 0; fadeChips(); }
   });
+
+  // big totals shrink just enough to fit their cell, never below 12px, instead of getting cut off
+  function fitStats(){
+    ["sTotal","sOwed","sMargin"].forEach(function(id){
+      var e = $(id); e.style.fontSize = "";
+      if(!e.clientWidth) return;
+      var size = parseFloat(getComputedStyle(e).fontSize);
+      while(e.scrollWidth > e.clientWidth + 1 && size > 12){ size -= 0.5; e.style.fontSize = size + "px"; }
+    });
+  }
+  window.addEventListener("resize", fitStats);
 
   /* ---------- PDFs: a sub's record, a driver's pay statement, a school's invoice ---------- */
   function exportRows(){
@@ -2030,6 +2531,7 @@
   }
   (async function(){
     await load();
+    resetHistory();
     render();
     if(!state.role) openWelcome();
     try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch(e){}
