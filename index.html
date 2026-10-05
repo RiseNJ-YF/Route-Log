@@ -606,6 +606,79 @@
   @media (hover:hover){ .sortchip:hover{filter:brightness(1.04)} }
   @media (min-width:760px){ .sortchip .wide-word{display:inline} .sortchip{padding:0 13px 0 15px;font-size:15px}
     .controls .invoice{flex:none;white-space:nowrap} .pick{flex:0 1 210px} }
+
+  /* ===== filter chips: one line, scrolls sideways on a phone ===== */
+  .controls{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:10px;margin-bottom:-6px}
+  .controls::-webkit-scrollbar{display:none}
+  .controls::after{content:"";flex:none;width:2px}
+  .fchip{
+    flex:none;height:40px;display:inline-flex;align-items:center;gap:5px;padding:0 11px 0 14px;
+    border:0;border-radius:999px;font-size:14px;font-weight:600;color:var(--label);white-space:nowrap;
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(24px) saturate(190%);backdrop-filter:blur(24px) saturate(190%);
+    box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),0 2px 6px rgba(0,0,0,.06);
+    transition:transform .18s cubic-bezier(.3,1.4,.5,1),background .2s;
+  }
+  .controls .sortchip{box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),0 2px 6px rgba(0,0,0,.06)}
+  .fchip:active{transform:scale(.95)}
+  .fchip > span{max-width:170px;overflow:hidden;text-overflow:ellipsis}
+  .fchip svg{width:14px;height:14px;color:var(--label2);flex:none}
+  .fchip.on{background:var(--tint-soft);box-shadow:inset 0 0 0 1.5px var(--tint),0 2px 6px rgba(0,0,0,.06)}
+  .fchip.on svg{color:var(--label)}
+  .fchip.clear{padding:0 14px 0 11px;color:var(--label2)}
+  .fchip.clear svg{width:13px;height:13px}
+  @media (hover:hover){ .fchip:hover{filter:brightness(1.04)} }
+
+  /* ===== Filter sheet ===== */
+  #sheetFilter .sheethead{grid-template-columns:76px 1fr 76px}
+  #sheetFilter .sheethead .iconbtn{justify-self:end}
+  .textbtn{
+    justify-self:start;height:36px;padding:0 14px;border:0;border-radius:999px;font-size:15px;font-weight:600;color:var(--label);
+    background:var(--glass);box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim);
+  }
+  .row.radio .lbl{display:flex;flex-direction:column;gap:1px;padding:11px 0}
+  .rsub{font-size:13px;color:var(--label2);font-weight:400}
+
+  /* ===== desktop: the two actions sit together, labelled, top right ===== */
+  .navbtns .only-wide{display:none}
+  .navpill{height:40px;padding:0 16px 0 13px;font-size:15px}
+  .navpill svg{width:18px;height:18px}
+  .navbtns .pill.glassy{box-shadow:inset 0 1px 0 var(--spec),inset 0 0 0 .5px var(--spec),0 0 0 .5px var(--rim),var(--lift)}
+  .navbtns .pill.tinted{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.14),var(--lift)}
+  @media (min-width:760px){
+    .navbtns .only-wide{display:inline-flex}
+    .navrow .seg{flex:0 1 340px}
+    .controls{overflow:visible;padding-bottom:4px;margin-bottom:0}
+  }
+
+  .controls.more{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 34px),transparent)}
+  /* sheet headers stay solid so content scrolling under them never shows through */
+  :root{--sheet-solid:rgba(242,242,247,.985)}
+  @media (prefers-color-scheme:dark){ :root{--sheet-solid:rgba(28,28,30,.985)} }
+  .sheethead{background:var(--sheet-solid)}
+
+  /* phones: drop the ▾ and tighten, so all four fit on one line */
+  @media (max-width:759px){
+    .controls{gap:6px}
+    .fchip{padding:0 12px;gap:4px}
+    .fchip:not(.clear) > svg{display:none}
+    .fchip.clear{padding:0 12px 0 10px}
+    .sortchip{padding:0 10px 0 12px;gap:4px}
+    .sortchip svg{width:13px;height:13px}
+  }
+  @media (min-width:760px){
+    .navbtns{flex:none}
+    .navpill{flex:none;white-space:nowrap}
+    .navrow .seg{flex:1 1 340px;max-width:340px;min-width:0}
+  }
+
+  /* ===== one Filter button ===== */
+  .filterbtn{flex:0 1 auto;min-width:0;padding:0 15px 0 12px;gap:7px}
+  .filterbtn > span{max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .controls .filterbtn > svg{display:inline-block !important;width:17px;height:17px;color:var(--label)}
+  .controls .clearx{flex:none;width:40px;height:40px}
+  .controls .clearx svg{width:15px;height:15px}
+  @media (max-width:759px){ .filterbtn{padding:0 14px 0 11px} }
 </style>
 </head>
 <body data-role="none">
@@ -622,7 +695,8 @@
       <button role="tab" id="tabSchools" data-go="schools" aria-selected="false">Bill schools</button>
     </div>
     <div class="navbtns">
-      <button class="iconbtn tinted only-wide" id="btnAddTop" aria-label="Log a trip" title="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="pill glassy only-wide navpill" id="btnExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="exportLbl">Create invoice</span></button>
+      <button class="pill tinted only-wide navpill" id="btnAddTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span id="addTopLbl">Log a trip</span></button>
       <button class="iconbtn" id="btnSettings" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 3.9-5.4 7-5.4s5.8 1.8 7 5.4"/></svg></button>
     </div>
   </div>
@@ -636,11 +710,10 @@
 
 <div id="storageWarn" class="warn" hidden><strong>Not saving.</strong> This browser is blocking storage, so nothing will survive a reload. Private browsing is the usual cause. Open it in a normal window, or use Back up in Settings before you close it.</div>
 
-<div class="controls">
+<div class="controls" id="controls">
   <button class="sortchip sort" id="btnSort" aria-label="Newest first. Tap to show oldest first." title="Newest first. Tap to flip."><span><span id="sortWord">Newest</span><span class="wide-word"> first</span></span><span id="sortArrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15M6 13.5l6 6 6-6"/></svg></span></button>
-  <span class="pick"><select id="fWho" aria-label="Filter"><option value="">All schools</option></select></span>
-  <span class="pick"><select id="fMonth" aria-label="Filter by month"><option value="">All dates</option></select></span>
-  <button class="pill glassy invoice" id="btnExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h6.5l4.5 4.5v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg><span id="exportLbl">Create invoice</span></button>
+  <button class="fchip filterbtn" id="btnFilter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span id="filterLbl">Filter</span></button>
+  <button class="iconbtn clearx" id="chipClear" aria-label="Clear filters" title="Clear filters" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 </div>
 
 <main id="log"></main>
@@ -746,6 +819,30 @@
     <button class="btn plain" id="btnXCsv">Download spreadsheet</button>
   </div>
   <p class="foot">The print screen opens. Choose Save as PDF to get a file you can email.</p>
+</section>
+
+<!-- filters -->
+<section class="sheet" id="sheetFilter" role="dialog" aria-modal="true" aria-labelledby="filtTitle">
+  <div class="sheethead">
+    <button class="textbtn" id="btnFiltClear">Clear</button>
+    <h3 id="filtTitle">Filter</h3>
+    <button class="iconbtn tinted" id="btnFiltDone" aria-label="Done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+  </div>
+  <p class="head" id="filtShowHead">Show</p>
+  <div class="form" id="filtShow"></div>
+  <p class="head" id="filtWhoHead">Schools</p>
+  <div class="form" id="filtWho"></div>
+  <p class="head" id="filtDateHead">Dates</p>
+  <div class="form" id="filtQuick"></div>
+  <p class="head">Your own range</p>
+  <div class="form">
+    <div class="row"><label for="filtFrom">From</label><input type="date" id="filtFrom"></div>
+    <div class="row"><label for="filtTo">To</label><input type="date" id="filtTo"></div>
+  </div>
+  <p class="head" id="filtMonthsHead">Months</p>
+  <div class="form" id="filtMonths"></div>
+  <p class="head" id="filtHebHead">Jewish months</p>
+  <div class="form" id="filtHeb"></div>
 </section>
 
 <!-- settings -->
@@ -1015,10 +1112,81 @@
       return who(a).localeCompare(who(b));
     });
   }
-  function filtered(){
-    var w = $("fWho").value, m = $("fMonth").value;
-    return sorted(state.sort).filter(function(r){ return (!w || who(r) === w) && (!m || monthKey(r.date) === m); });
+  /* ---------- filters: who, when, paid or not ---------- */
+  var filt = { who:[], date:{ kind:"all" }, status:"all" };
+  var HEB_NAMES = { Tishri:"Tishrei", Heshvan:"Cheshvan", Tamuz:"Tammuz" };
+  var hebFmt = null, heFmt = null, hebMemo = {};
+  try{
+    hebFmt = new Intl.DateTimeFormat("en-u-ca-hebrew", { year:"numeric", month:"long", day:"numeric", timeZone:"UTC" });
+    heFmt = new Intl.DateTimeFormat("he-u-ca-hebrew", { month:"long", timeZone:"UTC" });
+  }catch(e){}
+  function heb(s){
+    if(!hebFmt || !s) return null;
+    if(hebMemo[s]) return hebMemo[s];
+    var p = s.split("-"), dt = new Date(Date.UTC(+p[0], +p[1]-1, +p[2])), m = "", y = "";
+    hebFmt.formatToParts(dt).forEach(function(x){ if(x.type === "month") m = x.value; if(x.type === "year") y = x.value; });
+    if(!m || !y) return null;
+    return (hebMemo[s] = { key: y + "|" + m, label: (HEB_NAMES[m] || m) + " " + y, he: heFmt ? heFmt.format(dt) : "" });
   }
+  function addDays(s, n){ var x = d(s); x.setDate(x.getDate() + n); return iso(x); }
+  function hebRange(key, near){
+    // walk out from a day inside the month to its first and last day
+    var a = near, b = near, i, t;
+    for(i = 0; i < 32; i++){ t = heb(addDays(a, -1)); if(!t || t.key !== key) break; a = addDays(a, -1); }
+    for(i = 0; i < 32; i++){ t = heb(addDays(b, 1));  if(!t || t.key !== key) break; b = addDays(b, 1); }
+    return [a, b];
+  }
+  function weekStart(s){ var x = d(s); x.setDate(x.getDate() - x.getDay()); return iso(x); }   // weeks run Sunday to Saturday
+  function rangeOf(f){
+    var t = todayISO(), s;
+    switch(f.kind){
+      case "thisweek":  s = weekStart(t); return [s, addDays(s, 6)];
+      case "lastweek":  s = addDays(weekStart(t), -7); return [s, addDays(s, 6)];
+      case "thismonth": return [t.slice(0,7) + "-01", lastDayOf(t.slice(0,7))];
+      case "lastmonth": s = addDays(t.slice(0,7) + "-01", -1); return [s.slice(0,7) + "-01", lastDayOf(s.slice(0,7))];
+      case "month":     return [f.key + "-01", lastDayOf(f.key)];
+      case "heb":       return hebRange(f.key, f.near);
+      case "range":     return (f.from && f.to && f.from > f.to) ? [f.to, f.from] : [f.from || "", f.to || ""];
+    }
+    return null;
+  }
+  function inDates(r){
+    var f = filt.date;
+    if(f.kind === "all") return true;
+    if(f.kind === "heb"){ var h = heb(r.date); return !!h && h.key === f.key; }
+    var rg = rangeOf(f);
+    return (!rg[0] || r.date >= rg[0]) && (!rg[1] || r.date <= rg[1]);
+  }
+  function filtered(){
+    var w = filt.who, st = filt.status;
+    return sorted(state.sort).filter(function(r){
+      if(w.length && w.indexOf(who(r)) === -1) return false;
+      if(st !== "all" && (st === "paid") !== isPaid(r)) return false;
+      return inDates(r);
+    });
+  }
+  function filtersOn(){ return filt.who.length > 0 || filt.date.kind !== "all" || filt.status !== "all"; }
+  function shortRange(a, b){
+    var o = { month:"short", day:"numeric" };
+    if(a && b) return d(a).toLocaleDateString(undefined,o) + " – " + d(b).toLocaleDateString(undefined,o);
+    if(a) return "From " + d(a).toLocaleDateString(undefined,o);
+    if(b) return "Until " + d(b).toLocaleDateString(undefined,o);
+    return "";
+  }
+  var DATE_WORDS = { all:"All dates", thisweek:"This week", lastweek:"Last week", thismonth:"This month", lastmonth:"Last month" };
+  function dateLabel(f){
+    if(DATE_WORDS[f.kind]) return DATE_WORDS[f.kind];
+    if(f.kind === "month") return d(f.key + "-01").toLocaleDateString(undefined,{ month:"short", year:"numeric" });
+    if(f.kind === "heb") return f.label;
+    if(f.kind === "range"){ var rg = rangeOf(f); return shortRange(rg[0], rg[1]) || "All dates"; }
+    return "All dates";
+  }
+  function whoPhrase(){
+    var w = filt.who;
+    if(!w.length) return "";
+    return w.length === 1 ? w[0] : w.length + " " + (cfg().who === "driver" ? "drivers" : "schools");
+  }
+
   function optionList(arr){ return arr.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+"</option>"; }).join(""); }
 
   /* ---------- render ---------- */
@@ -1033,6 +1201,7 @@
     $("setSub").setAttribute("aria-checked", state.role === "sub" ? "true" : "false");
     $("setMgr").setAttribute("aria-checked", mgr ? "true" : "false");
     $("btnAddTop").setAttribute("aria-label", mgr ? "Log a route" : "Log a trip");
+    $("addTopLbl").textContent = mgr ? "Log a route" : "Log a trip";
 
     $("btnAdd").querySelector("span").textContent = mgr ? "Log a route" : "Log a trip";
     var pdfWord = v === "drivers" ? "Pay statement" : "Create invoice";
@@ -1046,20 +1215,23 @@
       ? "Oldest first. Tap to show newest first." : "Newest first. Tap to show oldest first.");
 
     var vis = visible();
-    var fw = $("fWho"), keepW = fw.value, people = uniqOf(vis, c.who);
-    fw.innerHTML = '<option value="">' + c.all + "</option>" + optionList(people);
-    fw.value = people.indexOf(keepW) !== -1 ? keepW : "";
-
-    var mk = {}; vis.forEach(function(r){ if(r.date) mk[monthKey(r.date)] = 1; });
-    var months = Object.keys(mk).sort().reverse(), fm = $("fMonth"), keepM = fm.value;
-    fm.innerHTML = '<option value="">All dates</option>'
-      + months.map(function(m){ return '<option value="'+m+'">'+esc(monthName(m))+"</option>"; }).join("");
-    fm.value = months.indexOf(keepM) !== -1 ? keepM : "";
+    var names = uniqOf(vis, c.who);
+    filt.who = filt.who.filter(function(n){ return names.indexOf(n) !== -1; });   // drop picks that no longer exist
+    // one Filter button; once anything is applied it says what
+    var applied = [];
+    if(filt.status !== "all") applied.push(filt.status === "paid" ? "Paid" : "Unpaid");
+    if(filt.who.length) applied.push(whoPhrase());
+    if(filt.date.kind !== "all") applied.push(dateLabel(filt.date));
+    $("filterLbl").textContent = applied.length ? applied.join(", ") : "Filter";
+    $("btnFilter").classList.toggle("on", applied.length > 0);
+    $("btnFilter").setAttribute("aria-label", applied.length ? "Filtered by " + applied.join(", ") + ". Change filters." : "Filter");
+    $("chipClear").hidden = !applied.length;
+    fadeChips();
 
     $("schoolList").innerHTML = uniqOf(state.routes, "school").map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
     $("driverList").innerHTML = uniqOf(state.routes, "driver").map(function(s){ return "<option>"+esc(s)+"</option>"; }).join("");
 
-    var list = filtered(), fwv = fw.value;
+    var list = filtered(), fwv = whoPhrase();
     var total = 0, owed = 0, billed = 0, payout = 0;
     list.forEach(function(r){
       var a = amt(r); total += a; if(!isPaid(r)) owed += a;
@@ -1129,7 +1301,7 @@
   function closeAll(force){
     if(!force && $("sheetWelcome").classList.contains("on")) return;   // first launch needs an answer
     $("scrim").classList.remove("on");
-    ["sheetWelcome","sheetTrip","sheetExport","sheetSettings"].forEach(function(i){ $(i).classList.remove("on"); });
+    ["sheetWelcome","sheetTrip","sheetExport","sheetSettings","sheetFilter"].forEach(function(i){ $(i).classList.remove("on"); });
   }
   $("scrim").addEventListener("click", function(){ closeAll(); });
   document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeAll(); });
@@ -1178,7 +1350,7 @@
       d.el.style.transform = "";  $("scrim").style.opacity = "";
       if(d.dy > d.h / 3 || (speed > 0.5 && d.dy > 40)) closeAll();   // otherwise it springs back
     }
-    ["sheetTrip","sheetExport","sheetSettings"].forEach(function(id){
+    ["sheetTrip","sheetExport","sheetSettings","sheetFilter"].forEach(function(id){
       var el = $(id);
       el.addEventListener("touchstart", start, { passive:true });
       el.addEventListener("touchmove", move, { passive:false });
@@ -1233,7 +1405,7 @@
     if(!confirm(msg)) return;
     state.role = r;
     state.tab = "drivers";
-    $("fWho").value = "";
+    filt.who = [];
     render(); $("log").scrollTop = 0;
     await save();
   }
@@ -1243,7 +1415,7 @@
   function setTab(t){
     if(!isMgr() || state.tab === t) return;
     state.tab = t;
-    $("fWho").value = "";
+    filt.who = [];
     render(); $("log").scrollTop = 0;
     save();
   }
@@ -1432,7 +1604,7 @@
   $("bulkPay").addEventListener("click", async function(){
     var hit = filtered().filter(function(r){ return !isPaid(r); });
     if(!hit.length) return;
-    var sum = hit.reduce(function(n,r){ return n + amt(r); }, 0), whom = $("fWho").value, v = view();
+    var sum = hit.reduce(function(n,r){ return n + amt(r); }, 0), whom = whoPhrase(), v = view();
     var q = "Mark " + hit.length + " " + cfg().noun[1] + " paid"
       + (whom ? (v === "drivers" ? " to " : " by ") + whom : "") + "? That's " + money.format(sum)
       + (v === "drivers" ? " paid out." : " received.");
@@ -1444,9 +1616,92 @@
     state.sort = state.sort === "asc" ? "desc" : "asc";
     render(); $("log").scrollTop = 0; await save();
   });
-  function refilter(){ render(); $("log").scrollTop = 0; }
-  $("fWho").addEventListener("change", refilter);
-  $("fMonth").addEventListener("change", refilter);
+  /* ---------- the Filter sheet: changes apply as you tap ---------- */
+  var CHECK = $("setSub").querySelector(".ck").innerHTML;
+  function opt(k, v, label, sub, on){
+    return '<button class="row link radio" data-k="' + k + '" data-v="' + esc(v) + '" role="menuitemcheckbox" aria-checked="' + (on ? "true" : "false") + '">'
+      + '<span class="lbl">' + esc(label) + (sub ? '<small class="rsub">' + esc(sub) + "</small>" : "") + "</span>"
+      + '<span class="ck">' + CHECK + "</span></button>";
+  }
+  function renderFilterSheet(){
+    var c = cfg(), vis = visible(), f = filt.date;
+    $("filtShow").innerHTML =
+        opt("status", "all",    "Paid and unpaid", "", filt.status === "all")
+      + opt("status", "unpaid", "Unpaid only",     "", filt.status === "unpaid")
+      + opt("status", "paid",   "Paid only",       "", filt.status === "paid");
+    $("filtWhoHead").textContent = c.who === "driver" ? "Drivers" : "Schools";
+    $("filtWho").innerHTML = opt("who", "", c.all, "", !filt.who.length)
+      + uniqOf(vis, c.who).map(function(n){ return opt("who", n, n, "", filt.who.indexOf(n) !== -1); }).join("");
+    $("filtQuick").innerHTML = ["all","thisweek","lastweek","thismonth","lastmonth"].map(function(k){
+      var rg = k === "all" ? null : rangeOf({ kind:k });
+      return opt("date", k, DATE_WORDS[k], rg ? shortRange(rg[0], rg[1]) : "", f.kind === k);
+    }).join("");
+    $("filtFrom").value = f.kind === "range" ? (f.from || "") : "";
+    $("filtTo").value = f.kind === "range" ? (f.to || "") : "";
+
+    var mk = {}; vis.forEach(function(r){ if(r.date) mk[monthKey(r.date)] = 1; });
+    var months = Object.keys(mk).sort().reverse();
+    $("filtMonthsHead").hidden = $("filtMonths").hidden = !months.length;
+    $("filtMonths").innerHTML = months.map(function(m){ return opt("month", m, monthName(m), "", f.kind === "month" && f.key === m); }).join("");
+
+    // Jewish months you have trips in, plus the current one, newest first
+    var hm = {}, keys = [];
+    [todayISO()].concat(vis.map(function(r){ return r.date; })).forEach(function(s){
+      var h = heb(s); if(!h) return;
+      if(!hm[h.key]){ hm[h.key] = { label:h.label, he:h.he, near:s, last:s }; keys.push(h.key); }
+      if(s > hm[h.key].last) hm[h.key].last = s;
+    });
+    keys.sort(function(a,b){ return hm[b].last.localeCompare(hm[a].last); });
+    $("filtHebHead").hidden = $("filtHeb").hidden = !keys.length;
+    $("filtHeb").innerHTML = keys.map(function(k){ var h = hm[k]; return opt("heb", k, h.label, h.he, f.kind === "heb" && f.key === k); }).join("");
+  }
+  function applyFilters(){ render(); renderFilterSheet(); $("log").scrollTop = 0; }
+  $("sheetFilter").addEventListener("click", function(e){
+    var b = e.target.closest("[data-k]");
+    if(!b) return;
+    var k = b.dataset.k, v = b.dataset.v;
+    if(k === "status") filt.status = v;
+    else if(k === "who"){
+      if(!v) filt.who = [];
+      else { var i = filt.who.indexOf(v); if(i === -1) filt.who.push(v); else filt.who.splice(i, 1); }
+    }
+    else if(k === "date") filt.date = { kind:v };
+    else if(k === "month") filt.date = { kind:"month", key:v };
+    else if(k === "heb"){
+      var near = [todayISO()].concat(visible().map(function(r){ return r.date; }))
+        .filter(function(s){ var h = heb(s); return h && h.key === v; })[0];
+      filt.date = { kind:"heb", key:v, label:heb(near).label, near:near };
+    }
+    applyFilters();
+  });
+  ["filtFrom","filtTo"].forEach(function(id){
+    $(id).addEventListener("change", function(){
+      var a = $("filtFrom").value, b = $("filtTo").value;
+      filt.date = (a || b) ? { kind:"range", from:a, to:b } : { kind:"all" };
+      applyFilters();
+    });
+  });
+  function openFilters(sec){
+    renderFilterSheet();
+    open($("sheetFilter"));
+    var h = sec && $(sec);
+    if(h) setTimeout(function(){ $("sheetFilter").scrollTop = Math.max(0, h.offsetTop - 72); }, 30);
+  }
+  $("btnFilter").addEventListener("click", function(){ openFilters(); });
+  function clearFilters(){ filt = { who:[], date:{ kind:"all" }, status:"all" }; applyFilters(); }
+  $("chipClear").addEventListener("click", clearFilters);
+  $("btnFiltClear").addEventListener("click", clearFilters);
+  $("btnFiltDone").addEventListener("click", function(){ closeAll(); });
+  // the chip line scrolls sideways on narrow phones: fade the edge while there's more, start from the left again after a sheet
+  function fadeChips(){
+    var ctl = $("controls"), more = ctl.scrollWidth > ctl.clientWidth + 2;
+    ctl.classList.toggle("more", more && ctl.scrollLeft + ctl.clientWidth < ctl.scrollWidth - 4);
+  }
+  $("controls").addEventListener("scroll", fadeChips, { passive:true });
+  window.addEventListener("resize", fadeChips);
+  $("scrim").addEventListener("transitionend", function(){
+    if(!$("scrim").classList.contains("on")){ $("controls").scrollLeft = 0; fadeChips(); }
+  });
 
   /* ---------- PDFs: a sub's record, a driver's pay statement, a school's invoice ---------- */
   function exportRows(){
@@ -1479,10 +1734,11 @@
     $("xUnpaidLbl").textContent = v === "mine" ? "Only trips I haven't been paid for"
       : (v === "drivers" ? "Only routes I haven't paid this driver for" : "Only routes this school hasn't paid for");
     $("xWho").innerHTML = optionList(people);
-    if($("fWho").value) $("xWho").value = $("fWho").value;
-    var fm = $("fMonth").value;
-    $("xFrom").value = fm ? fm + "-01" : "";
-    $("xTo").value = fm ? lastDayOf(fm) : "";
+    if(filt.who.length) $("xWho").value = filt.who[0];
+    var rg = filt.date.kind === "all" ? null : rangeOf(filt.date);
+    $("xFrom").value = rg ? (rg[0] || "") : "";
+    $("xTo").value = rg ? (rg[1] || "") : "";
+    $("xUnpaid").checked = filt.status !== "paid";
     updateCount();
     open($("sheetExport"), "xWho");
   }
