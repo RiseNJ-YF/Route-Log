@@ -1,6 +1,6 @@
 /* Route Log offline shell.
    Bump CACHE when you change index.html, or the old copy keeps being served. */
-var CACHE = "route-log-v4";
+var CACHE = "route-log-v14";
 var SHELL = [
   "./",
   "./index.html",

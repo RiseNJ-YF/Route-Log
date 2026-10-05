@@ -1,67 +1,52 @@
-# Route Log — putting it on GitHub Pages
+# Route Log
 
-This folder is the app, packaged so your phone will install it: own icon, no
-browser bars, opens with no signal.
+One app for both sides of substitute bus driving. On first launch it asks how
+you'll use it:
 
-Everything here is static. No build step, no dependencies, nothing to compile.
+- **I drive** — log the trips you cover, check them off as schools pay, and
+  send each school a PDF record of what you're owed.
+- **I manage subs** — track routes your subs drive across schools. A switch at
+  the top flips between **Pay drivers** (what you owe each sub) and **Bill
+  schools** (what each school owes you), with pay statements and invoices.
 
-## Before you start
+Switch any time in Settings. Nothing is deleted when you switch:
 
-**The repo has to be public.** On a free GitHub account, Pages only publishes
-from public repositories — private ones need Pro. That's fine here: none of
-your trips live in the repo. The files are just the app, and your log is stored
-on your phone. Nobody reading the repo sees a single trip, fee, or school.
+- Driver → manager: your own trips show under Pay drivers with your name, and
+  under Bill schools at the fee you charged.
+- Manager → driver: routes other subs drove are kept, just hidden until you
+  switch back.
 
-If you'd rather it not be public at all, the alternative is a subfolder on
-risearchitecture.com.
+## Updating from the two separate apps
 
-## Publishing it
+This replaces Route Log at its existing URL. Push it to the `route-log` repo.
 
-1. New repository, name it `route-log`, set it **Public**, create.
-2. Upload the contents of this folder — `index.html`, `manifest.webmanifest`,
-   `sw.js`, `.nojekyll`, and the `icons` folder. Drag them onto the repo page.
-   Upload the *contents*, not the folder itself, so `index.html` sits at the
-   top level of the repo.
-3. Settings → Pages → Source: **Deploy from a branch**, branch `main`, folder
-   `/ (root)`. Save.
-4. Wait a minute or two. Your app is at
-   `https://YOURNAME.github.io/route-log/`
+On first launch it looks for data from the old **Route Log** and **Route Desk**
+on the same device and brings both in automatically. That works because GitHub
+Pages serves all your repos from one site (`yourname.github.io`), and browsers
+keep storage per site. The old data is copied, never deleted, so the old apps
+keep working if anything goes wrong.
 
-HTTPS is automatic, which is the part that makes it installable.
+Managers who used Route Desk should open the Route Log URL from now on and
+install it from there. Once you've confirmed everything came across, you can
+delete the `route-desk` repo.
 
-## Installing it on your phone
+If the old data is on a different device, use Back up in the old app, then
+Settings → Restore a backup here. It accepts backups from the old Route Log,
+the old Route Desk, and this app.
 
-Open that URL on your phone, then:
+## Subs and managers working together
 
-- **iPhone** — must be Safari. Share button → Add to Home Screen.
-- **Android** — Chrome menu → Install app (or Add to Home screen).
+A sub's Settings → Export spreadsheet produces a file the manager imports with
+Settings → Import spreadsheet. It asks which sub it's from, maps their fee to
+driver pay, and leaves the manager's school billing alone. Importing the same
+file twice updates rather than duplicates.
 
-Launch it from the icon, not a browser tab. On iPhone that matters: Safari
-wipes a site's stored data after seven days without a visit, but home-screen
-apps are exempt from that sweep. From the icon, your log stays put.
+## Publishing
 
-## Moving your existing trips over
-
-Storage is tied to the address the app runs at, so trips logged in the
-downloaded file won't show up at the GitHub URL. Carry them across once:
-
-1. Old copy → Your details → **Back up trips**. Saves a `.json` file.
-2. Installed app → Your details → **Restore a backup** → pick that file.
-
-Then work only in the installed one.
+Upload the contents of this folder so `index.html` is at the top level of the
+repo. Settings → Pages → Deploy from a branch → `main` → `/ (root)`.
 
 ## Changing it later
 
-Edit `index.html`, and bump `CACHE = "route-log-v1"` to `v2` in `sw.js` before
-you push. Without that bump, phones keep serving the cached old copy and you'll
-think your change didn't deploy.
-
-## Files
-
-| File | What it does |
-|---|---|
-| `index.html` | The whole app — markup, styles, and logic in one file |
-| `manifest.webmanifest` | Name, icon, and colors your phone reads when installing |
-| `sw.js` | Caches the app so it opens offline |
-| `.nojekyll` | Tells Pages to serve the files as-is |
-| `icons/` | Home screen icons |
+Bump `CACHE = "route-log-v14"` in `sw.js` whenever you change `index.html`, or
+installed copies keep serving the old version.
