@@ -48,5 +48,5 @@ repo. Settings → Pages → Deploy from a branch → `main` → `/ (root)`.
 
 ## Changing it later
 
-Bump `CACHE = "route-log-v23"` in `sw.js` whenever you change `index.html`, or
+Bump `CACHE = "route-log-v24"` in `sw.js` whenever you change `index.html`, or
 installed copies keep serving the old version.

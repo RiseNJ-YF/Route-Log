@@ -819,6 +819,15 @@
   .pickbtn.mixed,.combo-opt.dim{color:var(--label3)}
   .pickbtn:focus-visible{outline:none}
   .row.combo:focus-within .pickbtn{color:var(--label)}
+
+  /* ===== clear button in text fields ===== */
+  .clearbtn{flex:none;width:32px;height:32px;margin:0 -6px 0 2px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .clearbtn span{position:relative;width:19px;height:19px;border-radius:50%;background:var(--label3);transition:background .15s}
+  .clearbtn span::before,.clearbtn span::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:1.8px;border-radius:1px;background:var(--card)}
+  .clearbtn span::before{transform:translate(-50%,-50%) rotate(45deg)}
+  .clearbtn span::after{transform:translate(-50%,-50%) rotate(-45deg)}
+  .clearbtn:active span{background:var(--label2)}
+  @media (hover:hover){ .clearbtn:hover span{background:var(--label2)} }
 </style>
 </head>
 <body data-role="none">
@@ -915,9 +924,9 @@
   </div>
   <div class="form">
     <div class="row"><label for="fDate">Date</label><input type="date" id="fDate"></div>
-    <div class="row"><label for="fSchoolIn">School</label><input type="text" id="fSchoolIn" list="schoolList" placeholder="Lincoln Elementary" autocomplete="off"></div>
+    <div class="row"><label for="fSchoolIn">School</label><input type="text" id="fSchoolIn" list="schoolList" placeholder="Pick or type a school" autocomplete="off"></div>
     <div class="row"><label for="fRoute">Route</label><input type="text" id="fRoute" placeholder="Optional" autocomplete="off"></div>
-    <div class="row mgr-only"><label for="fDriverIn">Driven by</label><input type="text" id="fDriverIn" list="driverList" placeholder="Dana Okafor" autocomplete="off"></div>
+    <div class="row mgr-only"><label for="fDriverIn">Driven by</label><input type="text" id="fDriverIn" list="driverList" placeholder="Pick or type a driver" autocomplete="off"></div>
   </div>
   <p class="foot" id="autoHint" hidden>Filled in from the last time this route ran. Change anything that's different today.</p>
   <div class="form">
@@ -931,8 +940,8 @@
       </select></div>
     <div class="row"><label for="fStart">Start</label><input type="time" id="fStart"></div>
     <div class="row"><label for="fEnd">End</label><input type="time" id="fEnd"></div>
-    <div class="row"><label for="fBus">Bus</label><input type="text" id="fBus" inputmode="numeric" placeholder="217"></div>
-    <div class="row"><label for="fColor">Color</label><input type="text" id="fColor" list="colorList" placeholder="Yellow" autocomplete="off"><span id="swatch" aria-hidden="true"></span></div>
+    <div class="row"><label for="fBus">Bus</label><input type="text" id="fBus" inputmode="numeric" placeholder="Number"></div>
+    <div class="row"><label for="fColor">Color</label><input type="text" id="fColor" list="colorList" placeholder="Pick or type" autocomplete="off"><span id="swatch" aria-hidden="true"></span></div>
   </div>
   <div class="form">
     <div class="row"><label for="fPay"><span class="sub-only">Fee</span><span class="mgr-only">Pay to driver</span></label><input type="number" id="fPay" inputmode="decimal" step="0.01" min="0" placeholder="$0.00"></div>
@@ -1684,6 +1693,7 @@
     BK.forEach(function(p){
       var v = $(p[0]).value, f = p[1];
       if(v === bkInit[p[0]] || v === "__mixed") return;
+      if((f === "school" || f === "driver") && !v.trim()) return;   // a trip needs a school; blank here means "keep"
       if(!mgr && (f === "driver" || f === "rate")) return;
       edits[f] = (f === "pay" || f === "rate") ? (v === "" ? 0 : (+v || 0)) : (f === "run" ? v : v.trim());
     });
@@ -1965,6 +1975,32 @@
     sync();
   }
   ["fRun","bkRun","xWho"].forEach(picker);
+
+  /* ---------- a clear button in text fields: one tap empties it, you stay in the field ---------- */
+  function clearable(id){
+    var input = $(id); if(!input) return;
+    var row = input.closest(".row"), lab = row && row.querySelector("label");
+    var x = document.createElement("button");
+    x.type = "button"; x.className = "clearbtn"; x.id = id + "Clear"; x.hidden = true; x.tabIndex = -1;
+    x.setAttribute("aria-label", "Clear " + (lab ? lab.textContent.trim().toLowerCase() : "field"));
+    x.innerHTML = '<span aria-hidden="true"></span>';
+    input.insertAdjacentElement("afterend", x);
+    function upd(){ x.hidden = !(document.activeElement === input && input.value !== ""); }
+    input.addEventListener("focus", upd);
+    input.addEventListener("input", upd);
+    input.addEventListener("blur", function(){ setTimeout(upd, 170); });
+    x.addEventListener("mousedown", function(e){ e.preventDefault(); });       // don't take focus from the field
+    x.addEventListener("click", function(){
+      input.value = "";
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+      input.dispatchEvent(new Event("change", { bubbles:true }));
+      if(document.activeElement !== input) input.focus();
+      upd();
+    });
+  }
+  ["fSchoolIn","fDriverIn","fRoute","fBus","fColor","fPay","fRate","fNote",
+   "bkSchool","bkDriver","bkRoute","bkBus","bkColor","bkPay","bkRate",
+   "dName","dPhone","dLicense","bName","bAddress","bPhone","bEmail"].forEach(clearable);
 
   /* ---------- first launch ---------- */
   function openWelcome(){
