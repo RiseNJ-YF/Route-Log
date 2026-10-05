@@ -782,6 +782,43 @@
   /* ===== undo / redo ===== */
   .nav .iconbtn:disabled{opacity:.3;pointer-events:none;box-shadow:inset 0 0 0 .5px var(--rim)}
   @media (max-width:759px){ .navbtns{gap:6px} .nav .iconbtn{width:38px;height:38px} }
+
+  /* ===== pick-from-history fields: a floating list over the form ===== */
+  .row.combo{padding-right:40px}
+  .row.combo input{cursor:text}
+  .row.combo.open{background:var(--tint-soft)}
+  .sheet .row{scroll-margin-top:72px}
+  .combo-list{
+    position:absolute;z-index:2;max-height:264px;overflow-y:auto;overscroll-behavior:contain;
+    background:var(--card);border-radius:16px;
+    box-shadow:0 0 0 .5px var(--rim),0 14px 34px rgba(0,0,0,.2),0 2px 6px rgba(0,0,0,.08);
+    animation:comboIn .16s ease-out;
+  }
+  @keyframes comboIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .combo-opt{
+    display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:0 16px;
+    border:0;background:none;text-align:left;color:var(--label);font-size:16px;
+  }
+  .combo-opt + .combo-opt{box-shadow:inset 0 .5px 0 var(--sep)}
+  .combo-opt .ov{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .combo-opt small{flex:none;color:var(--label2);font-size:13px}
+  .combo-opt[aria-selected="true"]{color:var(--blue);font-weight:600}
+  .combo-opt.active,.combo-opt:active{background:var(--fill)}
+  .combo-opt.add{color:var(--blue);font-weight:600}
+  .combo-opt .plus{width:20px;text-align:center;font-size:20px;line-height:1}
+  .combo-opt .sw{flex:none;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 .5px var(--plate-rim),inset 0 1px 0 rgba(255,255,255,.4)}
+  .combo-empty{margin:0;padding:13px 16px;color:var(--label2);font-size:14px}
+  @media (hover:hover){ .combo-opt:hover{background:var(--fill)} }
+  @media (prefers-reduced-motion:reduce){ .combo-list{animation:none} }
+
+  /* ===== fixed-choice pickers ===== */
+  .pickbtn{
+    flex:1;min-width:0;padding:13px 0;border:0;background:none;text-align:right;
+    font-size:17px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .pickbtn.mixed,.combo-opt.dim{color:var(--label3)}
+  .pickbtn:focus-visible{outline:none}
+  .row.combo:focus-within .pickbtn{color:var(--label)}
 </style>
 </head>
 <body data-role="none">
@@ -1232,6 +1269,7 @@
       var o = document.createElement("option"); o.value = v; o.textContent = v; el.appendChild(o);
     }
     el.value = v;
+    if(el._sync) el._sync();
   }
   var probe = document.createElement("span"), colorCache = {yellow:[255,204,0],white:[255,255,255],blue:[0,122,255],black:[28,28,30],silver:[199,199,204],gray:[142,142,147],grey:[142,142,147],green:[52,199,89],red:[255,59,48],orange:[255,149,0],tan:[210,180,140],brown:[162,132,94],purple:[175,82,222]};
   function resolveColor(name){
@@ -1475,6 +1513,7 @@
   function closeAll(force){
     if(!force && $("sheetWelcome").classList.contains("on")) return;   // first launch needs an answer
     $("scrim").classList.remove("on");
+    if(closeOpenCombo) closeOpenCombo();
     ["sheetWelcome","sheetTrip","sheetExport","sheetSettings","sheetFilter","sheetBulk"].forEach(function(i){ $(i).classList.remove("on"); });
   }
   $("scrim").addEventListener("click", function(){ closeAll(); });
@@ -1487,6 +1526,7 @@
     function start(e){
       var el = e.currentTarget;
       if(!el.classList.contains("on") || !phone() || e.touches.length !== 1) return;
+      if(e.target.closest && e.target.closest(".combo-list")) return;
       var t = e.touches[0], top = el.getBoundingClientRect().top;
       var onHandle = t.clientY - top < HANDLE;            // grabber + pinned header
       if(!onHandle && el.scrollTop > 0) return;             // mid-form: let it scroll
@@ -1741,6 +1781,190 @@
     e.preventDefault();
     if(k === "y" || e.shiftKey) doRedo(); else doUndo();
   });
+
+  /* ---------- pick-from-history fields: school, driver, bus color ---------- */
+  var COLOR_BASE = ["Yellow","White","Blue","Black","Silver","Green","Red","Orange","Tan"];
+  function usage(field){
+    var n = {};
+    state.routes.forEach(function(r){ var v = String(r[field] == null ? "" : r[field]).trim(); if(v) n[v] = (n[v] || 0) + 1; });
+    return n;
+  }
+  function byUse(n){ return Object.keys(n).sort(function(a, b){ return (n[b] - n[a]) || a.localeCompare(b); }); }
+  var SOURCES = {
+    school: function(){ var n = usage("school"); return byUse(n).map(function(v){ return { v:v, sub:words(n[v]) }; }); },
+    driver: function(){ var n = usage("driver"); return byUse(n).map(function(v){ return { v:v, sub:words(n[v]) }; }); },
+    color:  function(){
+      var n = usage("color"), list = byUse(n);
+      COLOR_BASE.forEach(function(c){ if(!list.some(function(x){ return x.toLowerCase() === c.toLowerCase(); })) list.push(c); });
+      return list.map(function(v){ return { v:v, swatch:resolveColor(v), sub:n[v] ? words(n[v]) : "" }; });
+    }
+  };
+  var closeOpenCombo = null;
+  function combo(inputId, kind){
+    var input = $(inputId), row = input.closest(".row");
+    input.removeAttribute("list");
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-expanded", "false");
+    var list = document.createElement("div");
+    list.className = "combo-list"; list.id = inputId + "List"; list.setAttribute("role", "listbox"); list.hidden = true;
+    var sheet = input.closest(".sheet");
+    sheet.appendChild(list);
+    input.setAttribute("aria-controls", list.id);
+    row.classList.add("sel", "combo");
+    var typed = false, picking = false, active = -1;
+
+    function paint(){
+      var q = typed ? input.value.trim().toLowerCase() : "", cur = input.value.trim().toLowerCase();
+      var all = SOURCES[kind](), hits = all.filter(function(it){ return !q || it.v.toLowerCase().indexOf(q) !== -1; });
+      var fresh = typed && input.value.trim() && !all.some(function(it){ return it.v.toLowerCase() === cur; }) ? input.value.trim() : "";
+      var html = fresh ? '<button type="button" class="combo-opt add" role="option" id="' + list.id + '-new" data-v="' + esc(fresh) + '"><span class="plus">+</span><span class="ov">Add “' + esc(fresh) + '”</span></button>' : "";
+      html += hits.map(function(it, i){
+        return '<button type="button" class="combo-opt" role="option" id="' + list.id + "-" + i + '" data-v="' + esc(it.v) + '" aria-selected="' + (it.v.toLowerCase() === cur ? "true" : "false") + '">'
+          + (it.swatch ? '<span class="sw" style="background:rgb(' + it.swatch.join(",") + ')"></span>' : "")
+          + '<span class="ov">' + esc(it.v) + "</span>" + (it.sub ? "<small>" + esc(it.sub) + "</small>" : "") + "</button>";
+      }).join("");
+      list.innerHTML = html || '<p class="combo-empty">Nothing yet. Type one in.</p>';
+      if(!list.hidden) place();
+      active = -1; input.removeAttribute("aria-activedescendant");
+    }
+    function place(){
+      var sr = sheet.getBoundingClientRect(), rr = row.getBoundingClientRect(), fr = row.closest(".form").getBoundingClientRect();
+      list.style.top = (rr.bottom - sr.top + sheet.scrollTop + 4) + "px";
+      list.style.left = (fr.left - sr.left) + "px";
+      list.style.width = fr.width + "px";
+    }
+    function show(){
+      if(closeOpenCombo && closeOpenCombo !== close) closeOpenCombo();
+      typed = false; paint();
+      list.hidden = false; place(); row.classList.add("open"); input.setAttribute("aria-expanded", "true");
+      closeOpenCombo = close;
+      // bring the field up so its list isn't under the keyboard
+      setTimeout(function(){ if(!list.hidden && row.scrollIntoView) row.scrollIntoView({ block:"start", behavior:"smooth" }); }, 280);
+    }
+    function close(){
+      list.hidden = true; row.classList.remove("open"); input.setAttribute("aria-expanded", "false");
+      if(closeOpenCombo === close) closeOpenCombo = null;
+    }
+    function pick(v){
+      picking = true;
+      input.value = v;
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+      input.dispatchEvent(new Event("change", { bubbles:true }));
+      picking = false;
+      close(); input.blur();
+    }
+    function mark(opts){
+      opts.forEach(function(o, i){ o.classList.toggle("active", i === active); });
+      if(opts[active]){ input.setAttribute("aria-activedescendant", opts[active].id); if(opts[active].scrollIntoView) opts[active].scrollIntoView({ block:"nearest" }); }
+    }
+    input.addEventListener("focus", show);
+    input.addEventListener("click", function(){ if(list.hidden) show(); });
+    input.addEventListener("input", function(){
+      if(picking) return;
+      if(list.hidden) show();
+      typed = true; paint();
+    });
+    input.addEventListener("blur", function(){ setTimeout(function(){ if(document.activeElement !== input) close(); }, 160); });
+    list.addEventListener("mousedown", function(e){ e.preventDefault(); });   // keep the field focused while tapping an option
+    list.addEventListener("click", function(e){ var b = e.target.closest(".combo-opt"); if(b) pick(b.dataset.v); });
+    input.addEventListener("keydown", function(e){
+      if(list.hidden) return;
+      var opts = Array.prototype.slice.call(list.querySelectorAll(".combo-opt"));
+      if((e.key === "ArrowDown" || e.key === "ArrowUp") && opts.length){
+        e.preventDefault();
+        active = active < 0 ? (e.key === "ArrowDown" ? 0 : opts.length - 1) : (active + (e.key === "ArrowDown" ? 1 : -1) + opts.length) % opts.length;
+        mark(opts);
+      } else if(e.key === "Enter" && active >= 0){
+        e.preventDefault(); e.stopPropagation(); pick(opts[active].dataset.v);
+      } else if(e.key === "Escape"){
+        e.preventDefault(); e.stopPropagation(); close();
+      } else if(e.key === "Tab") close();
+    });
+    return close;
+  }
+  ["fSchoolIn","bkSchool"].forEach(function(id){ combo(id, "school"); });
+  ["fDriverIn","bkDriver"].forEach(function(id){ combo(id, "driver"); });
+  ["fColor","bkColor"].forEach(function(id){ combo(id, "color"); });
+  window.addEventListener("resize", function(){ if(closeOpenCombo) closeOpenCombo(); });
+
+  /* ---------- fixed-choice fields (Run, invoice School/Driver): same floating list, no typing ---------- */
+  function picker(selectId){
+    var box = $(selectId), row = box.closest(".row"), sheet = box.closest(".sheet"), active = -1;
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "pickbtn"; btn.id = selectId + "Btn";
+    btn.setAttribute("role", "combobox"); btn.setAttribute("aria-haspopup", "listbox"); btn.setAttribute("aria-expanded", "false");
+    box.parentNode.insertBefore(btn, box);
+    box.hidden = true; box.tabIndex = -1;                      // the real select stays as the value everything reads
+    var lab = row.querySelector('label[for="' + selectId + '"]'); if(lab) lab.setAttribute("for", btn.id);
+    var list = document.createElement("div");
+    list.className = "combo-list"; list.id = selectId + "List"; list.setAttribute("role", "listbox"); list.hidden = true;
+    sheet.appendChild(list);
+    btn.setAttribute("aria-controls", list.id);
+    row.classList.add("combo");
+
+    function sync(){
+      var o = box.options[box.selectedIndex];
+      btn.textContent = o ? o.textContent : "";
+      btn.classList.toggle("mixed", box.value === "__mixed");
+    }
+    box._sync = sync;
+    function place(){
+      var sr = sheet.getBoundingClientRect(), rr = row.getBoundingClientRect(), fr = row.closest(".form").getBoundingClientRect();
+      list.style.top = (rr.bottom - sr.top + sheet.scrollTop + 4) + "px";
+      list.style.left = (fr.left - sr.left) + "px";
+      list.style.width = fr.width + "px";
+    }
+    function paint(){
+      list.innerHTML = Array.prototype.map.call(box.options, function(o, i){
+        return '<button type="button" class="combo-opt' + (o.value === "__mixed" ? " dim" : "") + '" role="option" id="' + list.id + "-" + i + '" data-v="' + esc(o.value) + '" aria-selected="'
+          + (o.value === box.value ? "true" : "false") + '"><span class="ov">' + esc(o.textContent) + "</span></button>";
+      }).join("");
+    }
+    function mark(){
+      var opts = list.querySelectorAll(".combo-opt");
+      Array.prototype.forEach.call(opts, function(o, i){ o.classList.toggle("active", i === active); });
+      if(opts[active]){ btn.setAttribute("aria-activedescendant", opts[active].id); if(opts[active].scrollIntoView) opts[active].scrollIntoView({ block:"nearest" }); }
+    }
+    function show(){
+      if(closeOpenCombo && closeOpenCombo !== close) closeOpenCombo();
+      paint(); list.hidden = false; place();
+      row.classList.add("open"); btn.setAttribute("aria-expanded", "true");
+      closeOpenCombo = close;
+      active = box.selectedIndex; mark();
+    }
+    function close(){
+      list.hidden = true; row.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); btn.removeAttribute("aria-activedescendant");
+      if(closeOpenCombo === close) closeOpenCombo = null;
+    }
+    function pick(v){
+      box.value = v; sync();
+      box.dispatchEvent(new Event("input", { bubbles:true }));
+      box.dispatchEvent(new Event("change", { bubbles:true }));
+      close();
+    }
+    btn.addEventListener("click", function(){ if(list.hidden) show(); else close(); });
+    btn.addEventListener("blur", function(){ setTimeout(function(){ if(document.activeElement !== btn) close(); }, 160); });
+    list.addEventListener("mousedown", function(e){ e.preventDefault(); });
+    list.addEventListener("click", function(e){ var b = e.target.closest(".combo-opt"); if(b){ pick(b.dataset.v); btn.focus(); } });
+    btn.addEventListener("keydown", function(e){
+      var n = box.options.length;
+      if(list.hidden){
+        if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); show(); }
+        return;
+      }
+      if(e.key === "ArrowDown" || e.key === "ArrowUp"){
+        e.preventDefault();
+        active = (active + (e.key === "ArrowDown" ? 1 : -1) + n) % n; mark();
+      } else if((e.key === "Enter" || e.key === " ") && active >= 0){
+        e.preventDefault(); e.stopPropagation(); pick(box.options[active].value);
+      } else if(e.key === "Escape"){
+        e.preventDefault(); e.stopPropagation(); close();
+      } else if(e.key === "Tab") close();
+    });
+    sync();
+  }
+  ["fRun","bkRun","xWho"].forEach(picker);
 
   /* ---------- first launch ---------- */
   function openWelcome(){
@@ -2216,6 +2440,7 @@
     }).sort(function(a,b){ return a.date.localeCompare(b.date) || (a.start||"").localeCompare(b.start||""); });
   }
   function updateCount(){
+    if($("xWho")._sync) $("xWho")._sync();
     var rows = exportRows(), c = cfg(), sum = rows.reduce(function(n,r){ return n + amt(r); }, 0);
     $("xCount").textContent = rows.length
       ? rows.length + " " + c.noun[rows.length === 1 ? 0 : 1] + ", " + money.format(sum) + " total."
