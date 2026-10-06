@@ -158,9 +158,9 @@
     -webkit-appearance:none;appearance:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .pick::after,.row.sel::after{
-    content:"";position:absolute;top:50%;width:9px;height:15px;transform:translateY(-50%);pointer-events:none;
-    background:var(--label2);
-    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 15'%3E%3Cpath d='M1.2 5.2 4.5 1.9l3.3 3.3M1.2 9.8l3.3 3.3 3.3-3.3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 15'%3E%3Cpath d='M1.2 5.2 4.5 1.9l3.3 3.3M1.2 9.8l3.3 3.3 3.3-3.3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
+    content:"";position:absolute;top:50%;width:12px;height:8px;transform:translateY(-50%);pointer-events:none;
+    background:var(--label2);transition:transform .2s;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1.5 1.75 6 6.25l4.5-4.5' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1.5 1.75 6 6.25l4.5-4.5' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
   }
   .pick::after{right:14px}
   .sort svg{transition:transform .3s cubic-bezier(.3,1.3,.5,1)}
@@ -653,8 +653,8 @@
 
   .controls.more{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 34px),transparent)}
   /* sheet headers stay solid so content scrolling under them never shows through */
-  :root{--sheet-solid:rgba(242,242,247,.985)}
-  @media (prefers-color-scheme:dark){ :root{--sheet-solid:rgba(28,28,30,.985)} }
+  :root{--sheet-solid:#F2F2F7}
+  @media (prefers-color-scheme:dark){ :root{--sheet-solid:#1C1C1E} }
   .sheethead{background:var(--sheet-solid)}
 
   /* phones: drop the ▾ and tighten, so all four fit on one line */
@@ -828,6 +828,81 @@
   .clearbtn span::after{transform:translate(-50%,-50%) rotate(-45deg)}
   .clearbtn:active span{background:var(--label2)}
   @media (hover:hover){ .clearbtn:hover span{background:var(--label2)} }
+
+  /* ===== title on top, buttons at the bottom ===== */
+  .sheet{padding-bottom:0}
+  #sheetWelcome{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+  .sheethead,#sheetFilter .sheethead{display:block;text-align:center;padding:2px 16px 10px;min-height:0}
+  .sheethead h3{font-size:18px}
+  .subhint{margin:3px 0 0;font-size:12.5px;line-height:1.3;color:var(--label2)}
+  .sheetbar{
+    position:sticky;bottom:0;z-index:3;display:flex;gap:8px;
+    margin:16px -16px 0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));
+    background:var(--sheet-solid);box-shadow:0 -.5px 0 var(--sep);
+  }
+  .sheetbar .btn{flex:1 1 0;min-width:0;width:auto;height:50px;padding:0 10px;font-size:16px;white-space:nowrap;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  .sheetbar .btn svg{width:19px;height:19px;flex:none}
+  .sheetbar .b-del{color:var(--red);background:var(--card);box-shadow:0 0 0 .5px var(--rim)}
+  .sheetbar .btn[hidden]{display:none}
+  .sheetbar .btn:active{transform:scale(.97)}
+
+  /* stacked: Save full width on top, the other choices underneath */
+  .sheetbar{flex-wrap:wrap}
+  .sheetbar .b-save{order:-1;flex:1 1 100%}
+  .sheetbar .b-del{flex:1 1 0;width:auto;padding:0 10px}
+  .sheetbar .b-del span{display:inline}
+
+  #sheetTrip .form,#sheetBulk .form{margin-top:12px}
+  #sheetTrip .sheethead + .form{margin-top:2px}
+  .combo-list.up{animation-name:comboUp}
+  @keyframes comboUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  @media (min-width:760px){
+    .sheet{padding-bottom:0}
+    .sheethead,#sheetFilter .sheethead{padding:0 18px 10px}
+    .sheetbar{margin:16px -18px 0;padding:12px 18px 16px}
+  }
+  .searchrow{top:28px}
+  @media (min-width:760px){ .searchrow{top:16px} }
+
+  /* ===== picker panel (phones): the field you tapped, opened up with its list underneath ===== */
+  .ppscrim{position:fixed;inset:0;z-index:44;background:rgba(0,0,0,.12)}
+  .ppanel{
+    position:fixed;z-index:45;top:0;left:16px;display:flex;flex-direction:column;overflow:hidden;
+    background:var(--card);border-radius:var(--r-card);
+    box-shadow:0 0 0 .5px var(--rim),0 16px 40px rgba(0,0,0,.24),0 2px 6px rgba(0,0,0,.08);
+    animation:ppIn .16s ease-out;
+  }
+  @keyframes ppIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .pp-top{flex:none;display:flex;align-items:center;gap:10px;min-height:50px;padding:6px 6px 6px 16px;background:var(--tint-soft)}
+  .pp-label{flex:none;font-size:17px;color:var(--label)}
+  .pp-top input{
+    flex:1;min-width:0;height:38px;border:0;border-radius:10px;padding:0 10px 0 32px;font-size:16px;color:var(--label);outline:none;
+    background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") no-repeat 9px center/16px;
+    box-shadow:inset 0 0 0 .5px var(--rim);
+  }
+  .pp-top input::placeholder{color:var(--label2)}
+  .pp-done{flex:none;height:38px;padding:0 12px;border:0;border-radius:999px;background:none;color:var(--blue);font-size:16px;font-weight:600}
+  .pp-list{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;border-top:.5px solid var(--sep)}
+  .pp-list .combo-opt{min-height:50px;font-size:17px}
+  .pp-list .combo-empty:empty{display:none}
+  @media (prefers-reduced-motion:reduce){ .ppanel{animation:none} }
+
+
+  /* one field per line; the color name is enough, no dot in the field */
+  #sheetTrip .form,#sheetBulk .form{margin-top:14px}
+  #sheetTrip .sheethead + .form{margin-top:2px}
+  #sheetTrip #swatch{display:none}
+
+  /* the field on top of the picker, then the search line */
+  .pp-field{flex:none;display:flex;align-items:center;gap:10px;min-height:50px;padding:0 10px 0 16px;background:var(--tint-soft)}
+  .pp-field input{flex:1;min-width:0;border:0;background:none;outline:none;padding:13px 0;font-size:17px;text-align:right;color:var(--label)}
+  .pp-field input::placeholder{color:var(--label3)}
+  .pp-field .clearbtn{margin:0}
+  .pp-top{background:var(--card);border-top:.5px solid var(--sep);padding:6px 6px 6px 10px}
+  /* the arrow flips up while its list is open */
+  .row.combo.open::after{transform:translateY(-50%) rotate(180deg)}
 </style>
 </head>
 <body data-role="none">
@@ -918,17 +993,15 @@
 <!-- log / edit -->
 <section class="sheet" id="sheetTrip" role="dialog" aria-modal="true" aria-labelledby="tripTitle">
   <div class="sheethead">
-    <button class="iconbtn" id="btnCancelTrip" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
     <h3 id="tripTitle">Log a trip</h3>
-    <button class="iconbtn tinted" id="btnSave" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+    <p class="subhint" id="autoHint" hidden></p>
   </div>
   <div class="form">
     <div class="row"><label for="fDate">Date</label><input type="date" id="fDate"></div>
     <div class="row"><label for="fSchoolIn">School</label><input type="text" id="fSchoolIn" list="schoolList" placeholder="Pick or type a school" autocomplete="off"></div>
-    <div class="row"><label for="fRoute">Route</label><input type="text" id="fRoute" placeholder="Optional" autocomplete="off"></div>
     <div class="row mgr-only"><label for="fDriverIn">Driven by</label><input type="text" id="fDriverIn" list="driverList" placeholder="Pick or type a driver" autocomplete="off"></div>
+    <div class="row"><label for="fRoute">Route</label><input type="text" id="fRoute" placeholder="Optional" autocomplete="off"></div>
   </div>
-  <p class="foot" id="autoHint" hidden>Filled in from the last time this route ran. Change anything that's different today.</p>
   <div class="form">
     <div class="row sel"><label for="fRun">Run</label><select id="fRun">
         <option value="AM">AM</option>
@@ -952,10 +1025,6 @@
   <div class="form">
     <div class="row"><label for="fNote">Note</label><input type="text" id="fNote" placeholder="Prints on the PDF"></div>
   </div>
-  <div class="actions">
-    <button class="btn plain" id="btnSaveNext">Save and log the next one</button>
-    <button class="btn destructive" id="btnDelete" hidden>Delete</button>
-  </div>
   <datalist id="schoolList"></datalist>
   <datalist id="driverList"></datalist>
   <datalist id="colorList">
@@ -963,14 +1032,18 @@
     <option>Black</option><option>Silver</option><option>Green</option>
     <option>Red</option><option>Orange</option><option>Tan</option>
   </datalist>
+  <div class="sheetbar">
+    <button class="btn b-del" id="btnDelete" hidden aria-label="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg><span>Delete</span></button>
+    <button class="btn plain b-cancel" id="btnCancelTrip">Cancel</button>
+    <button class="btn plain b-alt" id="btnSaveNext">Save + next</button>
+    <button class="btn tinted b-save" id="btnSave">Save</button>
+  </div>
 </section>
 
 <!-- PDFs -->
 <section class="sheet" id="sheetExport" role="dialog" aria-modal="true" aria-labelledby="expTitle">
   <div class="sheethead">
-    <button class="iconbtn" id="btnCancelExport" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
     <h3 id="expTitle">Send to a school</h3>
-    <span></span>
   </div>
   <div class="form">
     <div class="row sel"><label for="xWho" id="xWhoLbl">School</label><select id="xWho"></select></div>
@@ -979,20 +1052,18 @@
     <label class="row toggle" for="xUnpaid"><span id="xUnpaidLbl">Only trips I haven't been paid for</span><input type="checkbox" id="xUnpaid" role="switch" checked></label>
   </div>
   <p class="foot" id="xCount"></p>
-  <div class="actions">
-    <button class="btn tinted" id="btnPrint">Create invoice</button>
-    <button class="btn plain" id="btnXCsv">Download spreadsheet</button>
-  </div>
   <p class="foot">The print screen opens. Choose Save as PDF to get a file you can email.</p>
+  <div class="actions"><button class="btn plain" id="btnXCsv">Download as a spreadsheet instead</button></div>
+  <div class="sheetbar">
+    <button class="btn plain b-cancel" id="btnCancelExport">Cancel</button>
+    <button class="btn tinted b-save" id="btnPrint">Create invoice</button>
+  </div>
 </section>
 
 <!-- filters -->
 <section class="sheet" id="sheetFilter" role="dialog" aria-modal="true" aria-labelledby="filtTitle">
   <div class="sheethead">
-    <button class="textbtn" id="btnFiltClear">Clear</button>
-    <button class="textbtn backbtn" id="btnFiltBack" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg><span>Filter</span></button>
     <h3 id="filtTitle">Filter</h3>
-    <button class="iconbtn tinted" id="btnFiltDone" aria-label="Done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
 
   <div class="fpage" id="fpMain">
@@ -1029,14 +1100,17 @@
     <button class="morebtn" id="moreHeb" hidden></button>
     <p class="foot" id="dateEmpty" hidden>No months match.</p>
   </div>
+  <div class="sheetbar">
+    <button class="btn plain b-aux" id="btnFiltClear">Clear</button>
+    <button class="btn plain b-aux" id="btnFiltBack" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg><span>Back</span></button>
+    <button class="btn tinted b-save" id="btnFiltDone">Done</button>
+  </div>
 </section>
 
 <!-- edit several at once -->
 <section class="sheet" id="sheetBulk" role="dialog" aria-modal="true" aria-labelledby="bulkTitle">
   <div class="sheethead">
-    <button class="iconbtn" id="btnBulkCancel" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
     <h3 id="bulkTitle">Edit trips</h3>
-    <button class="iconbtn tinted" id="btnBulkSave" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
   <p class="foot" style="margin:2px 16px 0">Only what you change is updated. "Mixed" means they differ; leave it and each keeps its own.</p>
   <div class="form">
@@ -1059,14 +1133,16 @@
     <div class="row"><label for="bkPay"><span class="sub-only">Fee</span><span class="mgr-only">Pay to driver</span></label><input type="number" id="bkPay" inputmode="decimal" step="0.01" min="0"></div>
     <div class="row mgr-only"><label for="bkRate">Bill to school</label><input type="number" id="bkRate" inputmode="decimal" step="0.01" min="0"></div>
   </div>
+  <div class="sheetbar">
+    <button class="btn plain b-cancel" id="btnBulkCancel">Cancel</button>
+    <button class="btn tinted b-save" id="btnBulkSave">Save</button>
+  </div>
 </section>
 
 <!-- settings -->
 <section class="sheet" id="sheetSettings" role="dialog" aria-modal="true" aria-labelledby="setTitle">
   <div class="sheethead">
-    <button class="iconbtn" id="btnCancelSettings" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
     <h3 id="setTitle">Settings</h3>
-    <button class="iconbtn tinted" id="btnSaveSettings" aria-label="Save settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
   </div>
   <p class="head">I use Route Log to</p>
   <div class="form" role="radiogroup" aria-label="Role">
@@ -1108,6 +1184,10 @@
   <p class="foot sub-only">Export spreadsheet gives your manager a file they can import straight into their copy.</p>
   <p class="foot mgr-only">Import takes a sub's exported spreadsheet as-is. It'll ask whose it is. Restore also accepts Route Desk backups.</p>
   <p class="foot" id="storeWhere"></p>
+  <div class="sheetbar">
+    <button class="btn plain b-cancel" id="btnCancelSettings">Cancel</button>
+    <button class="btn tinted b-save" id="btnSaveSettings">Save</button>
+  </div>
 </section>
 
 <div id="report"></div>
@@ -1530,7 +1610,7 @@
 
   /* ---------- swipe a sheet down to close it (phones) ---------- */
   (function(){
-    var drag = null, swallowClickUntil = 0, HANDLE = 64;
+    var drag = null, swallowClickUntil = 0, HANDLE = 56;
     function phone(){ return !window.matchMedia || window.matchMedia("(max-width:759px)").matches; }
     function start(e){
       var el = e.currentTarget;
@@ -1792,6 +1872,30 @@
     if(k === "y" || e.shiftKey) doRedo(); else doUndo();
   });
 
+  /* ---------- where a floating list goes: below the field, or above it when there's more room there ---------- */
+  var lastPlaced = null;
+  function placeList(list, row, sheet){
+    var sr = sheet.getBoundingClientRect(), rr = row.getBoundingClientRect(), fr = row.closest(".form").getBoundingClientRect();
+    var head = sheet.querySelector(".sheethead"), bar = sheet.querySelector(".sheetbar");
+    var topLim = head ? head.getBoundingClientRect().bottom : sr.top;
+    if(window.visualViewport) topLim = Math.max(topLim, visualViewport.offsetTop);
+    var botLim = Math.min(bar ? bar.getBoundingClientRect().top : sr.bottom, sr.bottom);
+    if(window.visualViewport) botLim = Math.min(botLim, visualViewport.offsetTop + visualViewport.height);   // keyboard
+    var below = botLim - rr.bottom - 10, above = rr.top - topLim - 10;
+    list.style.maxHeight = "none";
+    var want = Math.min(list.scrollHeight, 264), up = want > below && above > below;
+    var h = Math.max(96, Math.min(want, up ? above : below));
+    list.style.maxHeight = h + "px";
+    list.style.left = (fr.left - sr.left) + "px";
+    list.style.width = fr.width + "px";
+    list.style.top = ((up ? rr.top - 4 - Math.min(h, list.scrollHeight) : rr.bottom + 4) - sr.top + sheet.scrollTop) + "px";
+    list.classList.toggle("up", up);
+    lastPlaced = [list, row, sheet];
+  }
+  if(window.visualViewport) ["resize","scroll"].forEach(function(ev){ visualViewport.addEventListener(ev, function(){
+    if(lastPlaced && !lastPlaced[0].hidden) placeList(lastPlaced[0], lastPlaced[1], lastPlaced[2]);
+  }); });
+
   /* ---------- pick-from-history fields: school, driver, bus color ---------- */
   var COLOR_BASE = ["Yellow","White","Blue","Black","Silver","Green","Red","Orange","Tan"];
   function usage(field){
@@ -1809,6 +1913,100 @@
       return list.map(function(v){ return { v:v, swatch:resolveColor(v), sub:n[v] ? words(n[v]) : "" }; });
     }
   };
+  // the options for a field: "+ Add" when what you typed is new, then everything that matches, current one marked
+  function optionsHTML(kind, typedText, current, idBase){
+    var q = String(typedText || "").trim(), ql = q.toLowerCase(), cur = String(current || "").trim().toLowerCase();
+    var all = SOURCES[kind](), hits = all.filter(function(it){ return !ql || it.v.toLowerCase().indexOf(ql) !== -1; });
+    var fresh = q && !all.some(function(it){ return it.v.toLowerCase() === ql; }) ? q : "";
+    var html = fresh ? '<button type="button" class="combo-opt add" role="option" id="' + idBase + '-new" data-v="' + esc(fresh) + '"><span class="plus">+</span><span class="ov">Add “' + esc(fresh) + '”</span></button>' : "";
+    html += hits.map(function(it, i){
+      return '<button type="button" class="combo-opt" role="option" id="' + idBase + "-" + i + '" data-v="' + esc(it.v) + '" aria-selected="' + (it.v.toLowerCase() === cur ? "true" : "false") + '">'
+        + (it.swatch ? '<span class="sw" style="background:rgb(' + it.swatch.join(",") + ')"></span>' : "")
+        + '<span class="ov">' + esc(it.v) + "</span>" + (it.sub ? "<small>" + esc(it.sub) + "</small>" : "") + "</button>";
+    }).join("");
+    return html || '<p class="combo-empty">' + (q ? "" : "Nothing yet. Type one in.") + "</p>";
+  }
+
+  /* ---------- on a phone: a picker panel above the keyboard instead of a dropdown squeezed beside the field ---------- */
+  function touchUI(){ return !!(window.matchMedia && window.matchMedia("(pointer:coarse)").matches); }
+  var pp = (function(){
+    var scrim = document.createElement("div"); scrim.className = "ppscrim"; scrim.hidden = true;
+    var el = document.createElement("div"); el.className = "ppanel"; el.id = "pickPanel"; el.hidden = true;
+    el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true");
+    el.innerHTML = '<div class="pp-field"><label class="pp-label" id="ppLabel" for="ppField"></label>'
+      + '<input type="text" id="ppField" autocomplete="off" enterkeyhint="done">'
+      + '<button type="button" class="clearbtn" id="ppFieldClear" aria-label="Clear" hidden><span aria-hidden="true"></span></button></div>'
+      + '<div class="pp-top"><input type="search" id="ppSearch" autocomplete="off" enterkeyhint="search" placeholder="Search the list" aria-controls="ppList">'
+      + '<button type="button" class="pp-done" id="ppDone">Done</button></div>'
+      + '<div class="pp-list" id="ppList" role="listbox"></div>';
+    document.body.appendChild(scrim); document.body.appendChild(el);
+    var search = el.querySelector("#ppSearch"), list = el.querySelector("#ppList"), owner = null;
+    var field = el.querySelector("#ppField"), fieldClear = el.querySelector("#ppFieldClear"), fieldRow = el.querySelector(".pp-field");
+    var topRow = el.querySelector(".pp-top");
+    function paint(){ list.innerHTML = optionsHTML(owner.kind, search.value, field.value, "ppOpt"); place(); }
+    function place(){
+      if(el.hidden || !owner) return;
+      var L = document.documentElement.clientHeight || window.innerHeight;
+      var vv = window.visualViewport, vTop = vv ? vv.offsetTop : 0, vH = vv ? Math.min(vv.height, L - vTop) : L, vBot = vTop + vH;
+      var rr = owner.row.getBoundingClientRect(), fr = (owner.row.closest(".form") || owner.row).getBoundingClientRect();
+      el.style.left = fr.left + "px"; el.style.width = fr.width + "px";
+      var headH = (fieldRow.offsetHeight || 50) + (topRow.offsetHeight || 50), want = Math.min(list.scrollHeight, 4.5 * 50);   // try to show about four and a half rows
+      var top = rr.top;                                                               // sit right over the field
+      if(top + headH + want + 8 > vBot) top = vBot - 8 - headH - want;                 // not enough room under it: slide up just enough
+      top = Math.max(top, vTop + 8);
+      el.style.top = top + "px";
+      el.style.maxHeight = Math.max(headH + 50, vBot - 8 - top) + "px";
+    }
+    function close(){
+      if(el.hidden) return;
+      el.hidden = true; scrim.hidden = true;
+      if(document.activeElement === search) search.blur();
+      if(document.activeElement === field) field.blur();
+      if(owner){ owner.input.setAttribute("aria-expanded", "false"); owner.row.classList.remove("open"); if(document.activeElement === owner.input) owner.input.blur(); }
+      owner = null;
+      if(closeOpenCombo === close) closeOpenCombo = null;
+    }
+    function open(o){
+      if(closeOpenCombo && closeOpenCombo !== close) closeOpenCombo();
+      owner = o; search.value = ""; field.value = o.input.value; field.placeholder = o.input.placeholder || "";
+      el.querySelector("#ppLabel").textContent = o.label;
+      fieldClear.hidden = !field.value;
+      el.setAttribute("aria-label", o.label);
+      paint(); el.hidden = false; scrim.hidden = false; list.scrollTop = 0; place();
+      field.focus();    // same tap: cursor in the field, after what's already there, keyboard up
+      try{ field.setSelectionRange(field.value.length, field.value.length); }catch(e){}
+      o.input.setAttribute("aria-expanded", "true"); o.row.classList.add("open");
+      closeOpenCombo = close;
+    }
+    function pick(v){ var o = owner; close(); if(o) o.pick(v); }
+    // typing in the field changes the real field as you go; the search line only narrows the list
+    function writeBack(){
+      if(!owner) return;
+      owner.input.value = field.value;
+      owner.input.dispatchEvent(new Event("input", { bubbles:true }));
+      owner.input.dispatchEvent(new Event("change", { bubbles:true }));
+      fieldClear.hidden = !field.value;
+    }
+    field.addEventListener("input", function(){ writeBack(); paint(); });
+    field.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); close(); }
+    });
+    fieldClear.addEventListener("mousedown", function(e){ e.preventDefault(); });
+    fieldClear.addEventListener("click", function(){ field.value = ""; writeBack(); paint(); field.focus(); });
+    search.addEventListener("input", function(){ paint(); list.scrollTop = 0; });
+    search.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); e.stopPropagation(); var b = list.querySelector(".combo-opt"); if(b && search.value.trim()) pick(b.dataset.v); else close(); }
+      else if(e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); close(); }
+    });
+    list.addEventListener("mousedown", function(e){ e.preventDefault(); });
+    list.addEventListener("click", function(e){ var b = e.target.closest(".combo-opt"); if(b) pick(b.dataset.v); });
+    el.querySelector("#ppDone").addEventListener("click", close);
+    scrim.addEventListener("click", close);
+    if(window.visualViewport){ visualViewport.addEventListener("resize", place); visualViewport.addEventListener("scroll", place); }
+    window.addEventListener("resize", place);
+    return { open:open, close:close, isOpen:function(){ return !el.hidden; } };
+  })();
+
   var closeOpenCombo = null;
   function combo(inputId, kind){
     var input = $(inputId), row = input.closest(".row");
@@ -1825,25 +2023,11 @@
     var typed = false, picking = false, active = -1;
 
     function paint(){
-      var q = typed ? input.value.trim().toLowerCase() : "", cur = input.value.trim().toLowerCase();
-      var all = SOURCES[kind](), hits = all.filter(function(it){ return !q || it.v.toLowerCase().indexOf(q) !== -1; });
-      var fresh = typed && input.value.trim() && !all.some(function(it){ return it.v.toLowerCase() === cur; }) ? input.value.trim() : "";
-      var html = fresh ? '<button type="button" class="combo-opt add" role="option" id="' + list.id + '-new" data-v="' + esc(fresh) + '"><span class="plus">+</span><span class="ov">Add “' + esc(fresh) + '”</span></button>' : "";
-      html += hits.map(function(it, i){
-        return '<button type="button" class="combo-opt" role="option" id="' + list.id + "-" + i + '" data-v="' + esc(it.v) + '" aria-selected="' + (it.v.toLowerCase() === cur ? "true" : "false") + '">'
-          + (it.swatch ? '<span class="sw" style="background:rgb(' + it.swatch.join(",") + ')"></span>' : "")
-          + '<span class="ov">' + esc(it.v) + "</span>" + (it.sub ? "<small>" + esc(it.sub) + "</small>" : "") + "</button>";
-      }).join("");
-      list.innerHTML = html || '<p class="combo-empty">Nothing yet. Type one in.</p>';
+      list.innerHTML = optionsHTML(kind, typed ? input.value : "", input.value, list.id);
       if(!list.hidden) place();
       active = -1; input.removeAttribute("aria-activedescendant");
     }
-    function place(){
-      var sr = sheet.getBoundingClientRect(), rr = row.getBoundingClientRect(), fr = row.closest(".form").getBoundingClientRect();
-      list.style.top = (rr.bottom - sr.top + sheet.scrollTop + 4) + "px";
-      list.style.left = (fr.left - sr.left) + "px";
-      list.style.width = fr.width + "px";
-    }
+    function place(){ placeList(list, row, sheet); }
     function show(){
       if(closeOpenCombo && closeOpenCombo !== close) closeOpenCombo();
       typed = false; paint();
@@ -1868,10 +2052,16 @@
       opts.forEach(function(o, i){ o.classList.toggle("active", i === active); });
       if(opts[active]){ input.setAttribute("aria-activedescendant", opts[active].id); if(opts[active].scrollIntoView) opts[active].scrollIntoView({ block:"nearest" }); }
     }
-    input.addEventListener("focus", show);
-    input.addEventListener("click", function(){ if(list.hidden) show(); });
+    var labelEl = row.querySelector("label");
+    function openPanel(){
+      pp.open({ kind:kind, input:input, row:row, label: labelEl ? labelEl.textContent.trim() : "",
+                pick:function(v){ pick(v); } });
+    }
+    if(touchUI()){ input.readOnly = true; input.setAttribute("aria-haspopup", "dialog"); }
+    input.addEventListener("focus", function(){ if(!touchUI()) show(); });
+    input.addEventListener("click", function(){ if(touchUI()) openPanel(); else if(list.hidden) show(); });
     input.addEventListener("input", function(){
-      if(picking) return;
+      if(picking || touchUI()) return;
       if(list.hidden) show();
       typed = true; paint();
     });
@@ -1896,7 +2086,7 @@
   ["fSchoolIn","bkSchool"].forEach(function(id){ combo(id, "school"); });
   ["fDriverIn","bkDriver"].forEach(function(id){ combo(id, "driver"); });
   ["fColor","bkColor"].forEach(function(id){ combo(id, "color"); });
-  window.addEventListener("resize", function(){ if(closeOpenCombo) closeOpenCombo(); });
+  window.addEventListener("resize", function(){ if(closeOpenCombo && !touchUI() && !pp.isOpen()) closeOpenCombo(); });
 
   /* ---------- fixed-choice fields (Run, invoice School/Driver): same floating list, no typing ---------- */
   function picker(selectId){
@@ -1919,12 +2109,7 @@
       btn.classList.toggle("mixed", box.value === "__mixed");
     }
     box._sync = sync;
-    function place(){
-      var sr = sheet.getBoundingClientRect(), rr = row.getBoundingClientRect(), fr = row.closest(".form").getBoundingClientRect();
-      list.style.top = (rr.bottom - sr.top + sheet.scrollTop + 4) + "px";
-      list.style.left = (fr.left - sr.left) + "px";
-      list.style.width = fr.width + "px";
-    }
+    function place(){ placeList(list, row, sheet); }
     function paint(){
       list.innerHTML = Array.prototype.map.call(box.options, function(o, i){
         return '<button type="button" class="combo-opt' + (o.value === "__mixed" ? " dim" : "") + '" role="option" id="' + list.id + "-" + i + '" data-v="' + esc(o.value) + '" aria-selected="'
@@ -2085,10 +2270,10 @@
     return b;
   }
   var HINTS = {
-    route: "Filled in from the last time this route ran. Change anything that's different today.",
-    school: "Filled in from your last trip to this school. Change anything that's different today.",
-    rate: "School rate filled in from the last route at this school.",
-    last: "Filled in from your last trip. Change anything that's different today."
+    route: "Filled in from the last time this route ran",
+    school: "Filled in from your last trip to this school",
+    rate: "School rate from the last route here",
+    last: "Filled in from your last trip"
   };
   function showHint(k){ $("autoHint").hidden = !k; $("autoHint").textContent = k ? HINTS[k] : ""; }
 
@@ -2112,7 +2297,7 @@
     $("fDriverPaid").checked = !!(r && r.driverPaid);
     $("fSchoolPaid").checked = !!(r && r.schoolPaid);
     $("fNote").value = fieldVal(r,"note");
-    $("btnDelete").textContent = "Delete " + noun;
+    $("btnDelete").setAttribute("aria-label", "Delete " + noun);
     $("btnDelete").hidden = !r;
     $("btnSaveNext").hidden = !!r;
     showHint("");
